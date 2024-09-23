@@ -1,0 +1,30 @@
+{
+  "type": "hexblade:glassocean",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "hexblade:glassocean",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:sandstone",
+          "height": 1
+        },
+        {
+          "block": "minecraft:water",
+          "height": 125
+        }
+      ],
+      "structure_overrides": [
+        "hexblade:firetower",
+        "hexblade:arcanetower",
+        "hexblade:frosttower"
+      ]
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "itemGroup.hexblade.general": "Spellblades and Such",
+  "item.hexblade.arcane_blade": "Таємниче чаролезо",
+   "item.hexblade.frost_blade": "Морозне чаролезо",
+    "item.hexblade.fire_blade": "Полум'яне чаролезо",
+  "item.hexblade.glacial_gladius": "Льодовиковий кортик",
+  "item.hexblade.crystal_cutlass": "Кристалічна шабля",
+  "item.hexblade.flaming_falchion": "Палючий фальшіон",
+  "item.hexblade.arcane_claymore": "Таємничий клеймор",
+    "item.hexblade.frost_claymore": "Морозний клеймор",
+      "item.hexblade.fire_claymore": "Полум'яний клеймор",
+  "item.hexblade.arcane_orb": "Таємнича сфера",
+    "item.hexblade.frost_orb": "Морозна сфера",
+      "item.hexblade.fire_orb": "Полум'яна сфера",
+  "item.hexblade.spelloil": "Зачароване масло",
+  "item.hexblade.whirlwindoil": "Вихрове масло",
+  "item.hexblade.smiteoil": "Небесне масло",
+  "item.hexblade.fire_battlemage_spell_book": "Полум'яні техніки",
+  "item.hexblade.frost_battlemage_spell_book": "Морозні техніки",
+  "item.hexblade.arcane_battlemage_spell_book": "Таємничі техніки",
+  "entity.hexblade.flamewaveprojectile": "Полум'яна хвиля",
+  "entity.hexblade.amethyst": "Аметист",
+  "entity.hexblade.gladius": "Морозне лезо",
+  "item.hexblade.monkeystaff": "Стовп короля мавп",
+  "spell.hexblade.monkeyreflect.name": "Вітри, що роздирають",
+  "spell.hexblade.monkeyreflect.description": "Розкрутіть порив вітру, завдаючи сильного відкидання та {damage} фізичної шкоди за секунду цільовому ворогу.",
+  "spell.hexblade.monkeyslam.name": "Голова в хмарах",
+  "spell.hexblade.monkeyslam.description": "Стрибайте в хмари, стаючи невразливим під час застосування.",
+
+
+  "spell.hexblade.flameslash.name": "Полум’яна рана",
+  "spell.hexblade.flameslash.description": "{damage} Полум'яний DPS. Дико розмахуйте зброєю, стріляючи палючими снарядами, що вибухають.",
+  "spell.hexblade.frostslash.name": "Крижаний шквал",
+  "spell.hexblade.frostslash.description": "{damage} Морозний DPS. Дико розмахуйте зброєю, стріляючи стрибучими, рикошетними снарядами.",
+  "spell.hexblade.amethystslash.name": "Аметистовий сплеск",
+  "spell.hexblade.amethystslash.description": "{damage} Таємничий DPS. Дико розмахуйте зброєю, стріляючи пронизливими аметистовими снарядами.",
+
+  "spell.hexblade.finalstrike.name": "Звуковий удар",
+  "spell.hexblade.finalstrike.description": "Здійснюйте смертоносну атаку на всіх ворогів у лінії, телепортуючись за останнім і завдаючи трикратної шкоди в ближньому бою, а також додатково {damage} шкоди від таємничих чар.",
+
+  "spell.hexblade.eviscerate.name": "Різня",
+  "spell.hexblade.eviscerate.description": "Станьте нематеріальним, атакуючи найближчих ворогів кілька разів протягом секунди, завдаючи 2.5-кратної шкоди в секунду в ближньому бою й додаткову шкоду в секунду {damage} від морозу, збільшуючи швидкість атаки. Оновлюється після вбивства, перестрибуючи на найближчого ворога.",
+
+  "spell.hexblade.whirlingblades.name": "Розривна течія",
+  "spell.hexblade.whirlingblades.description": "Прицілюйтесь і запускайте себе, наче з тризуба, зачарованого тягуном.",
+
+  "spell.hexblade.flicker_strike.name": "Мерехтливе полум'я",
+  "spell.hexblade.flicker_strike.description": "Стрибайте на найближчих ворогів рівномірно, завдаючи одного удару в секунду в ближньому бою й додаткову {damage} полум'яну шкоду, залежно від швидкості атаки. Зосереджується на одній цілі, якщо навколо більше нікого.",
+
+  "spell.hexblade.frostblink.name": "Таємне мерехтіння",
+  "spell.hexblade.frostblink.description": "Телепортуйтеся за спину ворога, завдаючи 1,5-кратної шкоди в ближньому бою та додаткову {damage} шкоду від таємничої магії.",
+
+  "spell.hexblade.frostvert.name": "Кігті світанкового дракона",
+  "spell.hexblade.frostvert.description": "Атакуйте ворогів попереду, завдаючи 1,5-кратної шкоди в ближньому бою й додаткову {damage} шкоду від полум'я, набираючи обертів.",
+
+  "spell.hexblade.smite.name": "Божественна кара",
+  "spell.hexblade.smite.description": "Карайте ворогів у зоні перед собою, завдаючи 1,5-кратної шкоди від атаки й {damage} додаткову священну шкоду кожному влученому ворогу; удвічі більше проти мерців.",
+
+  "spell.hexblade.maelstrom.name": "Вир",
+  "spell.hexblade.maelstrom.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову таємничу шкоду, помножену на швидкість атаки.",
+
+  "spell.hexblade.inferno.name": "Пекло",
+  "spell.hexblade.inferno.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову полум'яну шкоду, помножену на швидкість атаки.",
+
+  "spell.hexblade.tempest.name": "Буря",
+  "spell.hexblade.tempest.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову морозну шкоду, помножену на швидкість атаки.",
+
+  "spell.hexblade.whirlwind.name": "Вихор",
+  "spell.hexblade.whirlwind.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки.",
+
+  "spell.hexblade.arcaneflourish.name": "Таємничий розчерк",
+  "spell.hexblade.arcaneflourish.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову таємничу шкоду.",
+
+  "spell.hexblade.fireflourish.name": "Полум’яний розчерк",
+  "spell.hexblade.fireflourish.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову полум'яну шкоду.",
+
+  "spell.hexblade.frostflourish.name": "Морозний розчерк",
+  "spell.hexblade.frostflourish.description": "Обертайтеся безперервно, завдаючи 1,5-кратної шкоди від вашої атаки й {damage} додаткову морозну шкоду.",
+  "item.hexblade.runegleam_ingot": "Руноблисковий злиток",
+  "item.hexblade.runeblaze_ingot": "Руноспалаховий злиток",
+  "item.hexblade.runefrost_ingot": "Руноінієвий злиток",
+  "effect.hexblade.runicabsorption": "Рунічне поглинання",
+
+  "item.hexblade.runeblazing_head": "Руноспалаховий шолом",
+  "item.hexblade.runeblazing_chest": "Руноспалаховий нагрудник",
+  "item.hexblade.runeblazing_legs": "Руноспалахові наголінники",
+  "item.hexblade.runeblazing_feet": "Руноспалахові чоботи",
+  "item.hexblade.runefrosted_head": "Руноінієвий шолом",
+  "item.hexblade.runefrosted_chest": "Руноінієвий нагрудник",
+  "item.hexblade.runefrosted_legs": "Руноінієві наголінники",
+  "item.hexblade.runefrosted_feet": "Руноінієві чоботи",
+  "item.hexblade.runegleaming_head": "Руноблисковий шолом",
+  "item.hexblade.runegleaming_chest": "Руноблисковий нагрудник",
+  "item.hexblade.runegleaming_legs": "Руноблискові наголінники",
+  "item.hexblade.runegleaming_feet": "Руноблискові чоботи",
+  "item.hexblade.frozen_head": "Капелюх чарошукача",
+  "item.hexblade.frozen_chest": "Нагрудник магістра студеної смерті",
+  "item.hexblade.frozen_legs":  "Наголінники магістра студеної смерті",
+  "item.hexblade.frozen_feet":  "Чоботи магістра студеної смерті",
+  "item.hexblade.blazing_head": "Шолом чарознищення",
+  "item.hexblade.blazing_chest": "Нагрудник палючого магістра",
+  "item.hexblade.blazing_legs":  "Наголінники палючого магістра",
+  "item.hexblade.blazing_feet":  "Чоботи палючого магістра",
+  "item.hexblade.gleaming_head": "Корона чаровбивці",
+  "item.hexblade.gleaming_chest":"Нагрудник дзеркального магістра",
+  "item.hexblade.gleaming_legs": "Наголінники дзеркального магістра",
+  "item.hexblade.gleaming_feet": "Чоботи дзеркального магістра"
+}

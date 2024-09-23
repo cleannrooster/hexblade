@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "spellbladenext:blazing_feet",
+    "spellbladenext:frozen_feet",
+    "spellbladenext:gleaming_feet",
+    "spellbladenext:magus_feet",
+    "spellbladenext:ashherald_feet",
+    "spellbladenext:frostherald_feet",
+    "spellbladenext:arcaneherald_feet"
+  ]
+}

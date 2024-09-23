@@ -1,0 +1,16 @@
+{
+
+  "name": "hexblade:frosttower/reflect",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 5,
+      "element": {
+        "location": "hexblade:frosttowerreflect",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

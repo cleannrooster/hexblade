@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "spellbladenext:blazing_chest",
+    "spellbladenext:frozen_chest",
+    "spellbladenext:gleaming_chest",
+    "spellbladenext:magus_chest",
+    "spellbladenext:ashherald_chest",
+    "spellbladenext:frostherald_chest",
+    "spellbladenext:arcaneherald_chest"
+  ]
+}

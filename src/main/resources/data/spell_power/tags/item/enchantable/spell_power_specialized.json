@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+
+    "#hexblade:magister_armor",
+    "#hexblade:magus_armor",
+    "#hexblade:herald_armor"
+  ]
+}

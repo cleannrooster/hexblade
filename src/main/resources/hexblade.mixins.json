@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"package": "com.cleannrooster.hexblade.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ExampleMixin",
+		"ItemEntityMixin",
+		"LivingEntityMixin",
+		"SpellProjectileMixin"
+	],
+	"client": [
+		"EntityRenderDispatcherMixin"
+	],
+
+		"injectors": {
+		"defaultRequire": 1
+	}
+}

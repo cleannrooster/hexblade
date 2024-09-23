@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "spellbladenext:gleaming_legs",
+    "spellbladenext:blazing_legs",
+    "spellbladenext:frozen_legs",
+    "spellbladenext:magus_legs",
+    "spellbladenext:ashherald_legs",
+    "spellbladenext:frostherald_legs",
+    "spellbladenext:arcaneherald_legs"
+  ]
+}

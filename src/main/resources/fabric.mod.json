@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "hexblade",
+	"version": "${version}",
+	"name": "Hexblade",
+	"description": "This mod adds the Hexblade faction and the Magus boss, to go along with the Spellblades and Such mod!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/hexblade/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.cleannrooster.hexblade.Hexblade"
+		],
+		"client":
+						[
+							"com.cleannrooster.hexblade.HexbladeClient"
+						]
+	},
+	"mixins": [
+		"hexblade.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.3",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*",
+		"spellbladenext": ">=1.0.8+1.21.1"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

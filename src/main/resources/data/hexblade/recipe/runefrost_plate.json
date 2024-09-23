@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": {
+      "item": "spellbladenext:runefrost_ingot"
+    },
+    "D": {
+      "item": "hexblade:thread"
+    }
+  },
+  "pattern": [
+    "   ",
+    "ADA",
+    "   "
+  ],
+  "result": {
+    "id": "spellbladenext:runefrost_plate"
+  }
+}

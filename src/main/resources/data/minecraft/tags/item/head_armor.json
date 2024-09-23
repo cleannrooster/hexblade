@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "spellbladenext:blazing_head",
+    "spellbladenext:frozen_head",
+    "spellbladenext:gleaming_head",
+    "spellbladenext:magus_head",
+    "spellbladenext:ashherald_head",
+    "spellbladenext:frostherald_head",
+    "spellbladenext:arcaneherald_head"
+  ]
+}
