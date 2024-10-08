@@ -3,6 +3,7 @@ package com.cleannrooster.hexblade;
 import com.cleannrooster.hexblade.Armors.Armors;
 import com.cleannrooster.hexblade.block.HexbladeBlockItem;
 import com.cleannrooster.hexblade.config.ConfigSync;
+import com.cleannrooster.hexblade.config.Default;
 import com.cleannrooster.hexblade.config.ServerConfig;
 import com.cleannrooster.hexblade.config.ServerConfigWrapper;
 import com.cleannrooster.hexblade.effect.Hex;
@@ -13,7 +14,6 @@ import com.cleannrooster.hexblade.invasions.attackevent;
 import com.cleannrooster.hexblade.item.*;
 import com.cleannrooster.spellblades.SpellbladesAndSuch;
 import com.cleannrooster.spellblades.effect.CustomEffect;
-import com.cleannrooster.spellblades.items.loot.Default;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
@@ -120,7 +120,7 @@ public class Hexblade implements ModInitializer {
 
 	public static ItemGroup SPELLBLADES;
 	public static ConfigManager<ItemConfig> itemConfig = new ConfigManager<ItemConfig>
-			("items_v1", Default.itemConfig)
+			("items_v4", Default.itemConfig)
 			.builder()
 			.setDirectory(MOD_ID)
 			.sanitize(true)

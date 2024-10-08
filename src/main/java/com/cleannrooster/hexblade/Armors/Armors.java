@@ -4,6 +4,7 @@ import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.spellblades.SpellbladesAndSuch;
 import com.cleannrooster.spellblades.items.armor.RunicArmor;
 import com.extraspellattributes.ReabsorptionInit;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Items;
@@ -16,6 +17,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.item.ItemConfig;
 import net.spell_engine.api.item.armor.Armor;
+import net.spell_engine.internals.SpellHelper;
 import net.spell_power.api.SpellPowerMechanics;
 import net.spell_power.api.SpellSchools;
 
@@ -119,6 +121,7 @@ public class Armors {
     private static final float specializedRobeSpellPower = 0.25F;
     private static final float specializedRobeCritDamage = 0.1F;
     private static final float specializedRobeCritChance = 0.02F;
+    
     private static final float specializedRobeHaste = 0.03F;
     public static final Armor.Set Magus = create(
             magus,
@@ -126,33 +129,33 @@ public class Armors {
             20,
             (armorMaterialRegistryEntry,type,settings ) ->new MagusArmor(armorMaterialRegistryEntry,type,settings, SpellSchools.ARCANE),
             ItemConfig.ArmorSet.with(
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.3F),
 
                                     ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 5)
                             )),
-                    new ItemConfig.ArmorSet.Piece(8)
+                    new ItemConfig.ArmorSet.Piece(4)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 5)
-                            )),
-                    new ItemConfig.ArmorSet.Piece(6)
-                            .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.3F),
                                     ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 5)
                             )),
                     new ItemConfig.ArmorSet.Piece(3)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.3F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 5)
+                            )),
+                    new ItemConfig.ArmorSet.Piece(2)
+                            .addAll(List.of(
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.3F),
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.3F),
                                     ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 5)
                             ))
             ))
@@ -164,29 +167,37 @@ public class Armors {
             20,
             (armorMaterialRegistryEntry,type,settings ) ->new HeraldArmor(armorMaterialRegistryEntry,type,settings, SpellSchools.ARCANE),
             ItemConfig.ArmorSet.with(
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(8)
+                    new ItemConfig.ArmorSet.Piece(7)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(6)
+                    new ItemConfig.ArmorSet.Piece(5)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoarcane"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             ))
             ))
             .armorSet();
@@ -197,30 +208,37 @@ public class Armors {
             20,
             (armorMaterialRegistryEntry,type,settings ) ->new HeraldArmor(armorMaterialRegistryEntry,type,settings, SpellSchools.FROST),
             ItemConfig.ArmorSet.with(
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
-                            )),
-                    new ItemConfig.ArmorSet.Piece(8)
-                            .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
-                            )),
-                    new ItemConfig.ArmorSet.Piece(6)
-                            .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
-                            )),
-                    new ItemConfig.ArmorSet.Piece(3)
-                            .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
 
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
+                            )),
+                    new ItemConfig.ArmorSet.Piece(7)
+                            .addAll(List.of(
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
+                            )),
+                    new ItemConfig.ArmorSet.Piece(5)
+                            .addAll(List.of(
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
+                            )),
+                    new ItemConfig.ArmorSet.Piece(2)
+                            .addAll(List.of(
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofrost"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             ))
             ))
             .armorSet();
@@ -231,32 +249,36 @@ public class Armors {
             20,
             (armorMaterialRegistryEntry,type,settings ) ->new HeraldArmor(armorMaterialRegistryEntry,type,settings, SpellSchools.FIRE),
             ItemConfig.ArmorSet.with(
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
 
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(8)
+                    new ItemConfig.ArmorSet.Piece(7)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
 
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(6)
+                    new ItemConfig.ArmorSet.Piece(5)
                             .addAll(List.of(
                                     ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 1),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
 
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 4)
                             )),
-                    new ItemConfig.ArmorSet.Piece(3)
+                    new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.125F),
-                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.125F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttofire"), 0.12F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(ReabsorptionInit.MOD_ID,"converttoheal"), 0.06F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
 
                                     ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2)
                             ))
@@ -271,24 +293,27 @@ public class Armors {
             ItemConfig.ArmorSet.with(
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.4F),
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.HASTE.id, 0.12F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.2F),
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.HASTE.id, 0.06F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(6)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
-                    new ItemConfig.ArmorSet.Piece(4)
+                    new ItemConfig.ArmorSet.Piece(5)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.ARCANE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.ARCANE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ))
             .armorSet();
@@ -301,24 +326,27 @@ public class Armors {
             ItemConfig.ArmorSet.with(
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.08F),
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.HASTE.id, 0.12F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.04F),
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.HASTE.id, 0.06F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(6)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
-                    new ItemConfig.ArmorSet.Piece(4)
+                    new ItemConfig.ArmorSet.Piece(5)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FIRE.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FIRE.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ))
             .armorSet();
@@ -331,24 +359,25 @@ public class Armors {
             ItemConfig.ArmorSet.with(
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.08F),
-                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.4F),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.04F),
+                                    ItemConfig.Attribute.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.2F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(6)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
-                    new ItemConfig.ArmorSet.Piece(4)
+                    new ItemConfig.ArmorSet.Piece(5)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ItemConfig.ArmorSet.Piece(2)
                             .addAll(List.of(
-                                    ItemConfig.Attribute.bonus(SpellSchools.FROST.id, 2),
-                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 3)
+                                    ItemConfig.Attribute.multiply(SpellSchools.FROST.id, 0.20F),
+                                    ItemConfig.Attribute.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    ItemConfig.Attribute.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ))
             .armorSet();
