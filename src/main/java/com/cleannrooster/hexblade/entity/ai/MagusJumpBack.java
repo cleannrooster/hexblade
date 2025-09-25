@@ -17,8 +17,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.SpellRegistry;
-import net.spell_engine.particle.ParticleHelper;
+import net.spell_engine.api.spell.registry.SpellRegistry;
+import net.spell_engine.fx.ParticleHelper;
 import net.spell_engine.utils.SoundHelper;
 import net.spell_power.api.SpellDamageSource;
 import net.spell_power.api.SpellSchools;
@@ -115,7 +115,7 @@ public class MagusJumpBack<E extends Magus> extends MultiTickTask<E> {
         }
         if(time % 10 == 0) {
             if (livingEntity.getMagicSchool() == SpellSchools.ARCANE) {
-                Spell spell = SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID, "arcaneoverdrive"));
+                Spell spell = SpellRegistry.from(livingEntity.getWorld()).get(Identifier.of(SpellbladesAndSuch.MOD_ID, "arcaneoverdrive"));
                 if (!serverLevel.isClient()) {
                     ParticleHelper.sendBatches(livingEntity, spell.release.particles);
                     SoundHelper.playSound(serverLevel,livingEntity,spell.release.sound);
@@ -128,7 +128,7 @@ public class MagusJumpBack<E extends Magus> extends MultiTickTask<E> {
                 }
             }
             if (livingEntity.getMagicSchool() == SpellSchools.FIRE) {
-                Spell spell = SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID, "fireoverdrive"));
+                Spell spell = SpellRegistry.from(livingEntity.getWorld()).get(Identifier.of(SpellbladesAndSuch.MOD_ID, "fireoverdrive"));
                 if (!serverLevel.isClient()) {
                     ParticleHelper.sendBatches(livingEntity, spell.release.particles);
                     SoundHelper.playSound(serverLevel,livingEntity,spell.release.sound);
@@ -141,7 +141,7 @@ public class MagusJumpBack<E extends Magus> extends MultiTickTask<E> {
                 }
             }
             if (livingEntity.getMagicSchool() == SpellSchools.FROST) {
-                Spell spell = SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID, "frostoverdrive"));
+                Spell spell = SpellRegistry.from(livingEntity.getWorld()).get(Identifier.of(SpellbladesAndSuch.MOD_ID, "frostoverdrive"));
                 if (!serverLevel.isClient()) {
                     ParticleHelper.sendBatches(livingEntity, spell.release.particles);
                     SoundHelper.playSound(serverLevel,livingEntity,spell.release.sound);

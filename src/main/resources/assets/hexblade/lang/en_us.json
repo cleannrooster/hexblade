@@ -8,9 +8,9 @@
   "attribute.name.hexblade.converttoarcane" : "Attack Damage gained as Arcane Power",
   "attribute.name.hexblade.converttoheal" : "Attack Damage gained as Healing Power",
   "attribute.name.hexblade.purpose" : "of Non-Healing Spell Power gained as Healing Power",
-  "attribute.name.hexblade.omni" : "Omniscience per 1 Spell Power Attribute",
-  "attribute.desc.hexblade.omni" : "Omniscience is added onto your Spell Power at the end of the calculation.",
-  "attribute.name.hexblade.omni.desc" : "Omniscience is added onto your Spell Power at the end of the calculation.",
+  "attribute.name.hexblade.omni" : "Omniscience per 1 Basic Spell Power Attribute",
+  "attribute.desc.hexblade.omni" : "Omniscience is added onto your Basic Spell Power at the end of the calculation.",
+  "attribute.name.hexblade.omni.desc" : "Omniscience is added onto your Basic Spell Power at the end of the calculation.",
 
   "hexblade.spellbladetext": "Upon casting a spell with this Spellblade, you gain Strength and Haste equal to a quarter of your power relating to the spell's school, for up to however long the cooldown of the spell is.",
   "item.hexblade.ashes": "Ashes of the Stars",
@@ -232,6 +232,8 @@
   "item.hexblade.offering": "Hexblade Offering",
   "item.hexblade.hexbladeitem": "The Hexblade",
   "block.hexblade.hexblade": "The Hexblade",
+  "block.hexblade.ethereal_basalt": "Ethereal Basalt",
+
   "item.hexblade.starforge": "Starforge",
   "item.hexblade.voidforge": "Voidforge",
   "item.hexblade.weaverswand": "Weaver's Wand",
@@ -241,4 +243,6 @@
   "item.hexblade.magus_chest": "Magus Robe",
   "item.hexblade.magus_legs": "Magus Leggings",
   "item.hexblade.magus_feet": "Magus Boots"
+
+
 }

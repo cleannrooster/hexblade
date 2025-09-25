@@ -18,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static com.cleannrooster.hexblade.effect.Effects.HEXED;
+import static com.cleannrooster.hexblade.effect.Effects.MAGISTERFRIEND;
+
 public class Offering extends Item {
     public Offering(Settings settings) {
         super(settings);
@@ -29,7 +32,7 @@ public class Offering extends Item {
             if(context.getPlayer() != null && !context.getPlayer().isCreative()){
                 context.getPlayer().getItemCooldownManager().set(this,20*60);
             }
-            context.getPlayer().addStatusEffect(new StatusEffectInstance(Hexblade.MAGISTERFRIEND,20*60*5,0));
+            context.getPlayer().addStatusEffect(new StatusEffectInstance(MAGISTERFRIEND.registryEntry,20*60*5,0));
             HexbladePortal portal = new HexbladePortal(Hexblade.HEXBLADEPORTAL,context.getWorld());
             portal.setPos(context.getBlockPos().getX()+0.5,context.getBlockPos().getY()+1,context.getBlockPos().getZ()+0.5);
             float yaw = 360*context.getWorld().getRandom().nextFloat();
@@ -55,8 +58,8 @@ public class Offering extends Item {
     @Override
     public void inventoryTick(ItemStack itemStack, World level, Entity entity, int i, boolean bl) {
         if(entity instanceof PlayerEntity player){
-            if(player.hasStatusEffect(Hexblade.HEXED)){
-                player.removeStatusEffect(Hexblade.HEXED);
+            if(player.hasStatusEffect(HEXED.registryEntry)){
+                player.removeStatusEffect(HEXED.registryEntry);
                 player.sendMessage(Text.translatable("Your patronage has saved you. For now."),true);
                 itemStack.decrement(1);
             }

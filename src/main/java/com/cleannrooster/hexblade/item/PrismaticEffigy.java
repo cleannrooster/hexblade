@@ -3,6 +3,7 @@ package com.cleannrooster.hexblade.item;
 import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.hexblade.entity.Magus;
 import com.cleannrooster.hexblade.invasions.piglinsummon;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -50,6 +51,10 @@ public class PrismaticEffigy extends Item {
                         else if(Hexblade.config.magusWeaker){
                             player.sendMessage(Text.translatable("This dimension seems to diminish Magus' power."));
                         }
+                        if(magus.getWorld().isSkyVisible(magus.getBlockPos())){
+                            magus.setPosition(magus.getPos().add(0,12,0));
+                        }
+                        magus.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES,player.getPos());
                         level.spawnEntity(magus);
 
                         return TypedActionResult.consume(player.getStackInHand(interactionHand));

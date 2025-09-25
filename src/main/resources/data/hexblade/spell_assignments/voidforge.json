@@ -1,6 +1,8 @@
 {
   "is_proxy": true,
   "spell_ids": [
-    "spellbladenext:spellstrike"
+    "spellbladenext:flame_burst",
+    "spellbladenext:arcane_burst",
+    "spellbladenext:frost_burst"
   ]
 }

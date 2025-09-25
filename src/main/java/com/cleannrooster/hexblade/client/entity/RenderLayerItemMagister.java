@@ -1,5 +1,6 @@
 package com.cleannrooster.hexblade.client.entity;
 
+import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.hexblade.entity.Magister;
 import mod.azure.azurelib.common.api.client.renderer.layer.BlockAndItemGeoLayer;
 import mod.azure.azurelib.common.internal.client.renderer.GeoRenderer;
@@ -18,11 +19,9 @@ public class RenderLayerItemMagister extends BlockAndItemGeoLayer<Magister> {
     @Override
     protected ItemStack getStackForBone(GeoBone bone, Magister animatable) {
         // Retrieve the items in the entity's hands for the relevant bone
+
         return switch (bone.getName()) {
-            case LEFT_HAND -> animatable.isLeftHanded() ?
-                    animatable.getMainHandStack() : animatable.getOffHandStack();
-            case RIGHT_HAND -> animatable.isLeftHanded() ?
-                    animatable.getOffHandStack() : animatable.getMainHandStack();
+            case RIGHT_HAND -> animatable.getMainHandStack();
             default -> null;
         };
     }
@@ -30,7 +29,7 @@ public class RenderLayerItemMagister extends BlockAndItemGeoLayer<Magister> {
     protected ModelTransformationMode getTransformTypeForStack(GeoBone bone, ItemStack stack, Magister animatable) {
         // Apply the camera transform for the given hand
         return switch (bone.getName()) {
-            case LEFT_HAND, RIGHT_HAND -> ModelTransformationMode.THIRD_PERSON_RIGHT_HAND;
+            case RIGHT_HAND -> ModelTransformationMode.THIRD_PERSON_RIGHT_HAND;
             default -> ModelTransformationMode.NONE;
         };
     }

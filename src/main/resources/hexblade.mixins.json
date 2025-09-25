@@ -6,7 +6,9 @@
 		"ExampleMixin",
 		"ItemEntityMixin",
 		"LivingEntityMixin",
-		"SpellProjectileMixin"
+		"SpellProjectileMixin",
+		"EnchantmentMixin"
+
 	],
 	"client": [
 		"EntityRenderDispatcherMixin"

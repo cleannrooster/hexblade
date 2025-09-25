@@ -1,5 +1,6 @@
 package com.cleannrooster.hexblade.entity.ai;
 
+import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.hexblade.entity.Magus;
 import com.cleannrooster.spellblades.SpellbladesAndSuch;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -19,12 +20,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.spell_engine.api.spell.Spell;
+import net.spell_engine.api.spell.registry.SpellRegistry;
 import net.spell_engine.entity.SpellProjectile;
+import net.spell_engine.fx.SpellEngineParticles;
 import net.spell_engine.internals.SpellHelper;
-import net.spell_engine.internals.SpellRegistry;
-import net.spell_engine.internals.WorldScheduler;
-import net.spell_engine.particle.Particles;
+import net.spell_engine.internals.target.SpellTarget;
 import net.spell_engine.utils.SoundHelper;
+import net.spell_engine.utils.WorldScheduler;
 import net.spell_power.api.SpellPower;
 import net.spell_power.api.SpellSchools;
 
@@ -34,8 +36,6 @@ import java.util.Optional;
 import static com.cleannrooster.hexblade.entity.ai.MagusThrowGoal.rotate;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static net.spell_engine.internals.SpellHelper.impactTargetingMode;
-import static net.spell_engine.internals.SpellHelper.launchPoint;
 
 public class MagusSwirlGoal<E extends Magus> extends Goal{
     protected final E mob;
@@ -67,6 +67,9 @@ public class MagusSwirlGoal<E extends Magus> extends Goal{
     }
 
     public boolean canStart() {
+        if( mob.age < 100){
+            return false;
+        }
         long l = this.mob.getWorld().getTime();
         this.cooldown--;
         if (l - this.lastUpdateTime < 20L || this.cooldown > 0) {
@@ -104,7 +107,7 @@ public class MagusSwirlGoal<E extends Magus> extends Goal{
         this.nontriggeredtime = 0;
         this.end = false;
         this.cooldown = 0;
-        if(mob.getTarget() != null) {
+        if(mob.getTarget() != null ) {
             this.mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, this.mob.getTarget().getEyePos());
         }
     }
@@ -197,22 +200,10 @@ public class MagusSwirlGoal<E extends Magus> extends Goal{
     public void shootMissile(boolean finalthrow){
         if(this.mob.getTarget() != null) {
             if (!finalthrow) {
-                Spell spell = SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID, "arcane_swirl"));
-                SpellHelper.ImpactContext context = new SpellHelper.ImpactContext(1, 1.0F, (Vec3d) null, new SpellPower.Result(SpellSchools.ARCANE, mob.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * 0.8, 0, 1), impactTargetingMode(spell));
-                Vec3d launchPoint = launchPoint(mob);
-                Entity target = null;
-                SpellProjectile projectile = new SpellProjectile(mob.getWorld(), mob, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FLY, Identifier.of(SpellbladesAndSuch.MOD_ID, "arcane_swirl"), target, context, new Spell.ProjectileData().perks);
-                Spell.Release.Target.ShootProjectile projectileData = spell.release.target.projectile;
-                projectileData.projectile.homing_angle = 15;
-                float velocity = 0.2F;
-                float divergence = projectileData.projectile.divergence;
-                SoundHelper.playSoundEvent(mob.getWorld(), mob, SoundEvents.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
-                projectile.setVelocity(this.mob.getRotationVector().getX()*0.05, 0, this.mob.getRotationVector().getZ()*0.05, velocity, divergence);
-                projectile.range = spell.range;
-                projectile.getPitch(mob.getPitch());
-                projectile.setYaw(mob.getYaw());
-                mob.getWorld().spawnEntity(projectile);
-                mob.getDataTracker().set(Magus.TIER,0);
+                Spell spell = SpellRegistry.from(mob.getWorld()).get(Identifier.of(Hexblade.MOD_ID, "amethyst_slash2"));
+                SpellHelper.ImpactContext context = new SpellHelper.ImpactContext(1, 1.0F, (Vec3d) null, new SpellPower.Result(SpellSchools.ARCANE, mob.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * 0.8, 0, 1), SpellTarget.FocusMode.DIRECT,0);
+                SpellHelper.shootProjectile(mob.getWorld(),this.mob,null,SpellRegistry.from(mob.getWorld()).getEntry(spell),context);
+
 
             }
         }
@@ -254,10 +245,10 @@ public class MagusSwirlGoal<E extends Magus> extends Goal{
                         for(ServerPlayerEntity player : PlayerLookup.tracking(this.mob)) {
                             if (finalIi % 2 == 1) {
                                 //serverWorld.spawnParticles(player, Particles.snowflake.particleType,true, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0, 0, 0, 0);
-                                serverWorld.spawnParticles(player , Particles.snowflake.particleType,true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
+                                serverWorld.spawnParticles(player , SpellEngineParticles.snowflake.particleType(),true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
                             }
                             //serverWorld.spawnParticles(player,Particles.frost_shard.particleType, true, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0, 0, 0, 0);
-                            serverWorld.spawnParticles(player,Particles.frost_shard.particleType, true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
+                            serverWorld.spawnParticles(player,SpellEngineParticles.frost_shard.particleType(), true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
                         }
 
                     }

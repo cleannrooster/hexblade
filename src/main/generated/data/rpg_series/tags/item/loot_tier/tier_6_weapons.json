@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "hexblade:starforge",
+      "required": false
+    },
+    {
+      "id": "hexblade:voidforge",
+      "required": false
+    }
+  ]
+}

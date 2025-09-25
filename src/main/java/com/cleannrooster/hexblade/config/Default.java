@@ -14,14 +14,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.spell_engine.api.item.ItemConfig;
+
+import net.spell_engine.api.config.ConfigFile;
 import net.spell_engine.api.item.armor.Armor;
 import net.spell_engine.api.item.weapon.Weapon;
-import net.spell_engine.api.loot.LootConfig;
 
 public class Default {
-    public static final ItemConfig itemConfig = new ItemConfig();
-    public static final LootConfig lootConfig;
+    public static final ConfigFile.Equipment itemConfig = new ConfigFile.Equipment();
 
     public Default() {
     }
@@ -46,8 +45,7 @@ public class Default {
             itemConfig.armor_sets.put(armor.name(), armor.defaults());
         }
 
-        lootConfig = new LootConfig();
-        new LootConfig.Pool();
+
         String var3 = "weapons";
     }
 }

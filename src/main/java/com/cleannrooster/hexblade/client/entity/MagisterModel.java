@@ -19,6 +19,7 @@ public class MagisterModel<T extends Magister> extends GeoModel<Magister> implem
 
     @Override
     public Identifier getModelResource(Magister reaver) {
+
         if(reaver.getMainHandStack().getItem() instanceof Spellblade spellblade){
             if(spellblade.getSchool().equals(SpellSchools.FIRE)){
                 return Identifier.of(Hexblade.MOD_ID,"geo/firehexblade.json");
@@ -50,7 +51,7 @@ public class MagisterModel<T extends Magister> extends GeoModel<Magister> implem
 
     @Override
     public Identifier getAnimationResource(Magister reaver) {
-        return Identifier.of(Hexblade.MOD_ID,"animations/hexblade.animation.json");
+        return Identifier.of(Hexblade.MOD_ID,"animations/mobs.animations.json");
     }
     public void setArmAngle(Arm humanoidArm, MatrixStack poseStack) {
         this.translateAndRotate(poseStack);

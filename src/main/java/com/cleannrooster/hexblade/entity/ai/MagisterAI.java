@@ -24,8 +24,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.cleannrooster.hexblade.Hexblade.MAGISTERFRIEND;
 import static com.cleannrooster.hexblade.Hexblade.MOD_ID;
+import static com.cleannrooster.hexblade.effect.Effects.MAGISTERFRIEND;
 
 public class MagisterAI {
     private static final int ANGER_DURATION = 600;
@@ -143,7 +143,7 @@ public class MagisterAI {
 
     private static Optional<? extends LivingEntity> getTargetIfWithinRange(Magister abstractPiglin, MemoryModuleType<? extends LivingEntity> memoryModuleType) {
         return abstractPiglin.getBrain().getOptionalMemory(memoryModuleType).filter((livingEntity) -> {
-            return livingEntity.isInRange(abstractPiglin, 36) && !livingEntity.hasStatusEffect(MAGISTERFRIEND) && !(livingEntity instanceof Magister);
+            return livingEntity.isInRange(abstractPiglin, 36) && !livingEntity.hasStatusEffect(MAGISTERFRIEND.registryEntry) && !(livingEntity instanceof Magister);
         });
     }
 

@@ -1,0 +1,52 @@
+{
+  "values": [
+    {
+      "id": "spellbladenext:gleaming_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:gleaming_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:gleaming_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:gleaming_feet",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:blazing_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:blazing_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:blazing_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:blazing_feet",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frozen_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frozen_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frozen_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frozen_feet",
+      "required": false
+    }
+  ]
+}

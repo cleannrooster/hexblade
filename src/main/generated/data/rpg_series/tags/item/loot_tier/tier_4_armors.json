@@ -1,0 +1,52 @@
+{
+  "values": [
+    {
+      "id": "spellbladenext:arcaneherald_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:arcaneherald_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:arcaneherald_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:arcaneherald_feet",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frostherald_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frostherald_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frostherald_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:frostherald_feet",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:ashherald_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:ashherald_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:ashherald_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:ashherald_feet",
+      "required": false
+    }
+  ]
+}

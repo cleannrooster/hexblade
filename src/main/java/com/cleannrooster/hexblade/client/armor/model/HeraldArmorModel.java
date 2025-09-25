@@ -33,22 +33,22 @@ public class HeraldArmorModel extends GeoModel<HeraldArmor> {
 
         if(animatable.getMagicSchool().equals(SpellSchools.ARCANE)){
 
-            return Identifier.of(SpellbladesAndSuch.MOD_ID,"textures/armor/enigmaherald.png");
+            return Identifier.of(Hexblade.MOD_ID,"textures/armor/enigmaherald.png");
         }
         if(animatable.getMagicSchool().equals(SpellSchools.FROST)){
 
-            return Identifier.of(SpellbladesAndSuch.MOD_ID,"textures/armor/frigidherald.png");
+            return Identifier.of(Hexblade.MOD_ID,"textures/armor/frigidherald.png");
         }
         if(animatable.getMagicSchool().equals(SpellSchools.FIRE)){
 
-            return Identifier.of(SpellbladesAndSuch.MOD_ID,"textures/armor/ashenherald.png");
+            return Identifier.of(Hexblade.MOD_ID,"textures/armor/ashenherald.png");
         }
     /*    if(animatable.getMagicschool().contains(MagicSchool.FIRE)){
 
             return Identifier.of(Spellblades.MOD_ID,"textures/armor/rimeblaze.png");
 
         }*/
-        return Identifier.of(SpellbladesAndSuch.MOD_ID,"textures/armor/enigmaherald.png");
+        return Identifier.of(Hexblade.MOD_ID,"textures/armor/enigmaherald.png");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.cleannrooster.hexblade.entity;
 
 import com.cleannrooster.hexblade.Hexblade;
+import com.cleannrooster.hexblade.entity.ai.MagisterPathfinding;
 import com.cleannrooster.spellblades.items.Items;
 import mod.azure.azurelib.common.api.common.animatable.GeoEntity;
 import mod.azure.azurelib.common.internal.common.util.AzureLibUtil;
@@ -11,15 +12,18 @@ import mod.azure.azurelib.core.animation.AnimationController;
 import mod.azure.azurelib.core.animation.AnimationState;
 import mod.azure.azurelib.core.animation.RawAnimation;
 import mod.azure.azurelib.core.object.PlayState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -30,12 +34,19 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.spell_power.mixin.attributes.CrossEntityAttributeInstance;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public class HexbladePortal extends LivingEntity implements GeoEntity {
+import static com.cleannrooster.hexblade.entity.Magister.CASTER;
+import static com.cleannrooster.hexblade.entity.Magister.LEADER;
+
+public class HexbladePortal extends HostileEntity implements GeoEntity {
     public PlayerEntity owner;
     public boolean spawn = true;
     public boolean firstPiglin = true;
@@ -44,6 +55,8 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
     public boolean goinghome = false;
     public BlockPos origin = BlockPos.ORIGIN;
     public int experiencePoints = 160;
+    public int leaderID;
+    private UUID groupID;
 
     public HexbladePortal(EntityType<HexbladePortal> entityType, World world) {
         super(Hexblade.HEXBLADEPORTAL, world);
@@ -68,10 +81,7 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
     }
 
 
-    @Override
-    public ActionResult interact(PlayerEntity player, Hand hand) {
-        return super.interact(player, hand);
-    }
+
     public static final TrackedData<Integer> SPAWNED;
 
     @Override
@@ -88,17 +98,30 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
         builder.add(SPAWNED,0);
     }
 
+    public void setIshome(boolean ishome) {
+        this.ishome = ishome;
+    }
+
     public void readCustomDataFromNbt(NbtCompound compoundTag) {
 
         if (compoundTag.contains("Spawned")) {
             this.dataTracker.set(SPAWNED, compoundTag.getInt("Spawned"));
         }
+        this.ishome = compoundTag.getBoolean("isHome");
+
     }
     public void writeCustomDataToNbt(NbtCompound compoundTag) {
+        if(compoundTag.getBoolean("isHome")) {
+            compoundTag.putBoolean("isHome", true);
+        }
+        else{
+            compoundTag.putBoolean("isHome", false);
 
+        }
 
         compoundTag.putInt("Spawned", (Integer) this.dataTracker.get(SPAWNED));
     }
+
 
         @Override
     public Iterable<ItemStack> getArmorItems() {
@@ -129,8 +152,24 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
     }    @Override
     public void tick() {
         if(firstUpdate){
+
             SoundEvent soundEvent = SoundEvents.ENTITY_BLAZE_SHOOT;
             this.playSound(soundEvent, 1F, 0.5F);
+        }
+        if(!this.getWorld().isClient() && this.age % 5 == 0) {
+            for (Entity entity : this.getWorld().getOtherEntities(this, this.getBoundingBox().expand(2))) {
+                if (entity instanceof Magister magister && this.ishome) {
+                    if (magister.isLeader() && (magister.getGroup().isEmpty() || magister.getGroup().stream().noneMatch(Magister::isAlive))) {
+                        if (this.getWorld().isClient())
+                            magister.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+                        magister.discard();
+                    } else if (!magister.isLeader() && ((magister.getGroup().size() < 8) || magister.age > 1000)) {
+                        magister.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+                        magister.discard();
+
+                    }
+                }
+            }
         }
         for(int i = 0; i < 8; ++i) {
             double d = (double)this.getX() + random.nextDouble();
@@ -163,28 +202,75 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
 
         this.setNoGravity(true);
         this.noClip = true;
-        if (this.spawn && this.getDataTracker().get(SPAWNED) < 8 && this.age < 100 && this.age % 10 == 5 && !this.ishome) {
+
+        if (this.spawn && this.getDataTracker().get(SPAWNED) < 8 && this.age < 200 && this.age % 10 == 5 && !this.ishome) {
             Magister piglin = new Magister(Hexblade.REAVER, this.getWorld());
             piglin.setTemporary(true);
-            piglin.tryEquip(new ItemStack(List.of(Items.arcane_blade.item(),Items.frost_blade.item(),Items.fire_blade.item()).get(getRandom().nextInt(3))));
-            piglin.setPosition(this.getPos());
+            piglin.setPosition(this.getPos().add(0,0.5,0));
+
             if (firstPiglin) {
-                piglin.isleader = true;
+
+                piglin.getDataTracker().set(LEADER,true);
+                piglin.tryEquip(new ItemStack(Hexblade.HEXBLADEITEM));
+                Vec3d vec = MagisterPathfinding.getPathfindingTarget(piglin);
+                if(vec != null) {
+                    piglin.getNavigation().startMovingTo(vec.getX(), vec.getY(), vec.getZ(), 0.6F);
+                }
+                this.leaderID = piglin.getId();
+                this.groupID = UUID.randomUUID();
             }
-            if (this.random.nextInt(5) < 2) {
-                piglin.isCaster = true;
+            if(!firstPiglin){
+                piglin.tryEquip(new ItemStack(List.of(Items.arcane_blade.item(),Items.frost_blade.item(),Items.fire_blade.item()).get(getRandom().nextInt(3))));
+                piglin.setLeader(this.leaderID);
+                if (this.random.nextInt(5) < 2) {
+                    piglin.getDataTracker().set(CASTER, true);
+
+                    piglin.isCaster = true;
+                }
             }
 
+            piglin.setGroup(groupID);
+
+            piglin.rank = this.getDataTracker().get(SPAWNED);
             this.getDataTracker().set(SPAWNED,this.getDataTracker().get(SPAWNED)+1);
+
             this.getWorld().spawnEntity(piglin);
+
             firstPiglin = false;
         }
-        if (age > 240) {
+        if (age > 300 && !this.ishome) {
             this.getWorld().playSound((PlayerEntity)null, this.prevX, this.prevY, this.prevZ, SoundEvents.ENTITY_ENDERMAN_TELEPORT, this.getSoundCategory(), 1.0F, 1.0F);
             this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
             if( !this.getWorld().isClient()) {
                 this.discard();
             }
+        }
+        if(this.ishome){
+            if(this.getWorld().getEntityById(this.leaderID) instanceof Magister leader){
+            for(Magister magister :leader.getGroup()){
+                magister.retreating = true;
+                magister.getNavigation().startMovingTo(this,1.2F);
+            }
+            leader.retreating = true;
+                leader.getNavigation().startMovingTo(this,1.2F);
+
+                if(!leader.isAlive() ||  (this.age > 600 || (!leader.isAlive() && (leader.getGroup().isEmpty() || leader.getGroup().stream().noneMatch(Magister::isAlive))))) {
+                    if (!this.getWorld().isClient()) {
+                        this.getWorld().playSound((PlayerEntity)null, this.prevX, this.prevY, this.prevZ, SoundEvents.ENTITY_ENDERMAN_TELEPORT, this.getSoundCategory(), 1.0F, 1.0F);
+                        this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+
+                        this.discard();
+                    }
+                }
+            }
+            else{
+                if( !this.getWorld().isClient()) {
+                    this.getWorld().playSound((PlayerEntity)null, this.prevX, this.prevY, this.prevZ, SoundEvents.ENTITY_ENDERMAN_TELEPORT, this.getSoundCategory(), 1.0F, 1.0F);
+                    this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+
+                    this.discard();
+                }
+                }
         }
 
 
@@ -192,6 +278,13 @@ public class HexbladePortal extends LivingEntity implements GeoEntity {
 
         super.tick();
     }
+
+    @Override
+    public boolean collidesWith(Entity other) {
+
+        return super.collidesWith(other);
+    }
+
 
     @Override
     public Arm getMainArm() {

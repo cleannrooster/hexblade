@@ -14,8 +14,8 @@ public class MagisterArmorModel extends GeoModel<MagisterArmor> {
     public Identifier getModelResource(MagisterArmor animatable) {
         if(animatable.getSlotType() == EquipmentSlot.HEAD){
             if(animatable.getMagicSchool().equals(SpellSchools.ARCANE)){
-                return Identifier.of(SpellbladesAndSuch.MOD_ID,"geo/magebane.geo.json");
 
+                return Identifier.of(SpellbladesAndSuch.MOD_ID,"geo/magebane.geo.json");
 
 
             }

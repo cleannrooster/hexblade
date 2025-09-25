@@ -1,6 +1,7 @@
 package com.cleannrooster.hexblade.entity;
 
 import com.cleannrooster.hexblade.Hexblade;
+import com.cleannrooster.hexblade.effect.Hex;
 import com.cleannrooster.hexblade.entity.ai.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
@@ -37,15 +38,13 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
-import net.minecraft.entity.passive.ChickenEntity;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.passive.MerchantEntity;
-import net.minecraft.entity.passive.TurtleEntity;
+import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.inventory.SimpleInventory;
@@ -74,8 +73,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.SpellRegistry;
-import net.spell_engine.particle.ParticleHelper;
 import net.spell_engine.utils.SoundHelper;
 import net.spell_engine.utils.TargetHelper;
 import net.spell_power.api.*;
@@ -86,6 +83,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import static com.cleannrooster.hexblade.Hexblade.DIMENSIONKEY;
+import static com.cleannrooster.hexblade.effect.Effects.PORTALSICKNESS;
 import static java.lang.Math.*;
 import static net.minecraft.entity.attribute.EntityAttributes.GENERIC_FOLLOW_RANGE;
 import static net.spell_power.api.SpellSchools.*;
@@ -119,6 +117,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     public PlayerEntity hero = null;
     public boolean casting = false;
     public boolean canGiveGifts = false;
+    public ArrayList<Vec3d> positions = new ArrayList<>();
 
 
     private AnimatableInstanceCache factory = AzureLibUtil.createInstanceCache(this);
@@ -135,8 +134,10 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     public static final RawAnimation RYUENJIN =  RawAnimation.begin().then("animation.unknown.ryuenjin", Animation.LoopType.PLAY_ONCE);
 
     public static final RawAnimation ATTACK2 =  RawAnimation.begin().thenPlay("animation.hexblade.new2");
+    public static final RawAnimation INTRO =  RawAnimation.begin().thenPlay("animation.hexblade.intro");
+
     public static final RawAnimation WALK =  RawAnimation.begin().thenLoop("animation.unknown.walk");
-    public static final RawAnimation WALK2 =  RawAnimation.begin().thenLoop("animation.unknown.walk");
+    public static final RawAnimation WALK2 =  RawAnimation.begin().then("animation.hexblade.walk2",Animation.LoopType.PLAY_ONCE);
     public static final RawAnimation FLYINGANIM =  RawAnimation.begin().thenLoop("animation.hexblade.dash");
     public static final RawAnimation FLOATINGANIM =  RawAnimation.begin().thenLoop("animation.model.floattowards");
 
@@ -144,7 +145,6 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     public static final RawAnimation JUMPINGANIM =  RawAnimation.begin().thenLoop("animation.model.jump");
     public static final RawAnimation SPIN =  RawAnimation.begin().thenLoop("animation.model.floattowards2");
     public static final RawAnimation SMASH = RawAnimation.begin().thenLoop("animation.hexblade.whack");
-    public List<Vec3d> positions = new ArrayList<>();
 
     public  List<Vec3d> getPositions(){
         return this.positions;
@@ -170,6 +170,8 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     public static final TrackedData<Boolean> RAISING;
     public static final TrackedData<Boolean> JUMPING;
     public static final TrackedData<Boolean> BIDED;
+    public static final TrackedData<Boolean> APRILFOOLS;
+
     public int sincelastcrit = 0;
 
     static {
@@ -184,6 +186,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         BIDINGTIME = DataTracker.registerData(Magus.class, TrackedDataHandlerRegistry.INTEGER);
 
         DOWN2 = DataTracker.registerData(Magus.class, TrackedDataHandlerRegistry.BOOLEAN);
+        APRILFOOLS = DataTracker.registerData(Magus.class, TrackedDataHandlerRegistry.BOOLEAN);
 
     }
 
@@ -208,6 +211,8 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         builder.add(JUMPING, false);
         builder.add(BIDED, false);
         builder.add(DOWN2, false);
+        builder.add(APRILFOOLS, false);
+
     }
 
 
@@ -234,6 +239,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         compoundTag.putBoolean("jumping",this.dataTracker.get(JUMPING));
         compoundTag.putBoolean("biding",this.dataTracker.get(BIDED));
         compoundTag.putBoolean("down2",this.dataTracker.get(DOWN2));
+        compoundTag.putBoolean("aprilFools",this.dataTracker.get(APRILFOOLS));
 
         super.writeCustomDataToNbt(compoundTag);
 
@@ -265,6 +271,9 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         }
         if (compoundTag.contains("biding")) {
             this.dataTracker.set(BIDED, compoundTag.getBoolean("biding"));
+        }
+        if (compoundTag.contains("aprilFools")) {
+            this.dataTracker.set(APRILFOOLS, compoundTag.getBoolean("aprilFools"));
         }
         if (compoundTag.contains("down2")) {
             this.dataTracker.set(DOWN2, compoundTag.getBoolean("down2"));
@@ -363,10 +372,10 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
             return;
         }*/
 
-        if(this.age <= 10 && f < 999999){
+        if(this.age <= 100 && f < 999999){
             return;
         }
-        if(damageSource.getAttacker() instanceof PlayerEntity player && this.sincelastcrit >= 80 ) {
+        if( this.sincelastcrit >= 80 ) {
             SpellSchool magicSchool = this.getMagicSchool();
             if(magicSchool != null) {
                 RegistryEntry<DamageType> school = damageSource.getTypeRegistryEntry();
@@ -433,14 +442,15 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     }
     protected void initCustomGoals() {
 
+        this.goalSelector.add(2, new MagusAttackGoal<>(this, 1.0,false));
+        this.goalSelector.add(3, new MagusThrowGoal<>(this, 1.0,false));
+        this.goalSelector.add(4, new MagusDivebombGoal<>(this, 1.0,false));
+        this.goalSelector.add(5, new MagusSwirlGoal<>(this, 1.0,false));
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 0.7));
-        this.goalSelector.add(0, new MagusAttackGoal<>(this, 1.0,false));
-        this.goalSelector.add(1, new MagusThrowGoal<>(this, 1.0,false));
-        this.goalSelector.add(2, new MagusDivebombGoal<>(this, 1.0,false));
-        this.goalSelector.add(3, new MagusSwirlGoal<>(this, 1.0,false));
+        this.goalSelector.add(8, new SwimGoal(this));
+        this.goalSelector.add(9, new SwimAroundGoal(this,0.7F,120));
+
         this.goalSelector.add(10, new MagusFollowGoal(this,0.7));
-        this.goalSelector.add(11, new SwimGoal(this));
-        this.goalSelector.add(12, new SwimAroundGoal(this,0.7F,120));
 
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true, entity -> this.getLastAttacker() != null && this.getLastAttacker().equals(entity)));
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
@@ -449,9 +459,23 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         this.targetSelector.add(4, new ActiveTargetGoal<>(this, HostileEntity.class, true, entity -> !(entity instanceof Magus || entity instanceof Magister)));
 
     }
+
+    @Override
+    protected int computeFallDamage(float fallDistance, float damageMultiplier) {
+        return 0;
+    }
+
     @Override
     public void tick() {
+
         if(this.firstUpdate){
+            if(!this.getWorld().isClient()) {
+                this.dataTracker.set(APRILFOOLS, Hexblade.config.aprilFools);
+            }
+            this.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING,100,0));
+
+            this.triggerAnim("intro","intro");
+            this.playSound(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE,0.25F,1);
             if(this.getWorld().getRegistryKey() == DIMENSIONKEY) {
                 boolean flag = false;
                 if(this.getMaxHealth() == this.getHealth()){
@@ -468,13 +492,15 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
                 }
             }
         }
+        if(this.getTarget() != null){
+            this.positions.add(this.getTarget().getBoundingBox().getCenter());
+            if(this.positions.size() > 10){
+                this.positions.remove(0);
+            }
+        }
         super.tick();
         this.sincelastcrit++;
         if(this.getTarget() != null && this.getTarget().isAlive()) {
-        }
-        this.positions.add(this.getPos());
-        if(this.positions.size() > 8){
-            this.positions.remove(0);
         }
 
 
@@ -533,7 +559,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
             List<PlayerEntity> players = this.getWorld().getPlayers(TargetPredicate.createNonAttackable(),this,this.getBoundingBox().expand(32));
 
             players.forEach(player -> {
-                player.addStatusEffect(new StatusEffectInstance(Hexblade.PORTALSICKNESS,160,0,false,false));
+                player.addStatusEffect(new StatusEffectInstance(PORTALSICKNESS.registryEntry,160,0,false,false));
                 String string = "null";
                 Formatting chatFormatting = Formatting.GRAY;
                 if(getMagicSchool() == SpellSchools.ARCANE){
@@ -627,7 +653,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
                 this.setVelocity(speed);
             }
             if ((this.isOnGround() && this.risingtime > 20) || this.risingtime > 40) {
-                Spell spell = SpellRegistry.getSpell(Identifier.of(Spellblades.MOD_ID, "magus_firenova"));
+                Spell spell = SpellRegistry.from(mob.getWorld()).get(Identifier.of(Spellblades.MOD_ID, "magus_firenova"));
                 if(!this.getWorld().isClient()) {
                     ParticleHelper.sendBatches(this, spell.release.particles);
                 }
@@ -831,7 +857,15 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
     @Override
     public boolean isAiDisabled() {
 
-        return this.sincelastcrit < 40 || super.isAiDisabled();
+        return super.isAiDisabled();
+    }
+
+    @Override
+    public void move(MovementType movementType, Vec3d movement) {
+        if( this.sincelastcrit < 40 && this.age > 100){
+            return;
+        }
+        super.move(movementType, movement);
     }
 
     private PlayState predicate2(mod.azure.azurelib.core.animation.AnimationState<Magus> state) {
@@ -841,11 +875,7 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
         }
 
         if(state.isMoving()){
-            if(this.isAttacking()){
-                return state.setAndContinue(WALK2);
 
-
-            }
             return state.setAndContinue(WALK);
 
 
@@ -871,11 +901,18 @@ public class Magus extends HostileEntity implements InventoryOwner, GeoEntity {
                 new AnimationController<>(this, "hurt", event -> PlayState.CONTINUE)
                         .triggerableAnim("hurt", TANTRUM));
         controllers.add(
+                new AnimationController<>(this, "intro", event -> PlayState.CONTINUE)
+                        .triggerableAnim("intro", INTRO));
+
+        controllers.add(
                 new AnimationController<>(this, "slashone", event -> PlayState.CONTINUE)
                         .triggerableAnim("slashone", SLASHONE));
         controllers.add(
                 new AnimationController<>(this, "slashtwo", event -> PlayState.CONTINUE)
                         .triggerableAnim("slashtwo", SLASHTWO));
+        controllers.add(
+                new AnimationController<>(this, "walk2", event -> PlayState.CONTINUE)
+                        .triggerableAnim("walk2", WALK2));
         controllers.add(
                 new AnimationController<>(this, "slashthree", event -> PlayState.CONTINUE)
                         .triggerableAnim("slashthree", SLASHTHREE));

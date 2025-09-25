@@ -29,6 +29,8 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static com.cleannrooster.hexblade.Hexblade.*;
+import static com.cleannrooster.hexblade.effect.Effects.HEXED;
+import static com.cleannrooster.hexblade.effect.Effects.MAGISTERFRIEND;
 
 
 public class Hex extends StatusEffect {
@@ -62,7 +64,7 @@ public class Hex extends StatusEffect {
             }
 
         }
-        if(livingEntity.getStatusEffect(Hexblade.HEXED) != null && livingEntity.getStatusEffect(Hexblade.HEXED).getDuration() == 1){
+        if(livingEntity.getStatusEffect(HEXED.registryEntry) != null && livingEntity.getStatusEffect(HEXED.registryEntry).getDuration() == 1){
 
             if(livingEntity instanceof PlayerEntity player && !player.getWorld().isClient()){
                 Optional<BlockPos> pos = BlockPos.findClosest(player.getBlockPos(),64,128,
@@ -78,7 +80,7 @@ public class Hex extends StatusEffect {
                 }
                 else{
                     player.sendMessage(Text.translatable("Your patronage has saved you. For now."));
-                    player.addStatusEffect(new StatusEffectInstance(Hexblade.MAGISTERFRIEND,20*60*5,0));
+                    player.addStatusEffect(new StatusEffectInstance(MAGISTERFRIEND.registryEntry,20*60*5,0));
 
                     if(player instanceof ServerPlayerEntity player1) {
                         player1.getStatHandler().setStat(player1, Stats.CUSTOM.getOrCreateStat(SINCELASTHEX), 0);

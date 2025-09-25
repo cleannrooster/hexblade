@@ -92,8 +92,17 @@
           "name": "hexblade:hexbladeitem",
           "conditions": [
             {
-              "condition": "minecraft:random_chance",
-              "chance": 0.05
+              "condition": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "equipment": {
+                  "mainhand": {
+                    "items": [
+                      "hexblade:hexbladeitem"
+                    ]
+                  }
+                }
+              }
             }
           ]
         }

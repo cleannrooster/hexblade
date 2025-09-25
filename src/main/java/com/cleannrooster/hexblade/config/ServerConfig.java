@@ -46,5 +46,7 @@ public class ServerConfig  implements ConfigData {
     public String blacklist_spell_oil_regex = "";
     @Comment("Enable tabula rasa (Default: true")
     public boolean tab = true;
+    @Comment("Force April Fools Content")
+    public boolean aprilFools = false;
 
 }

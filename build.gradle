@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -14,7 +14,7 @@ repositories {
 	maven { url 'https://jitpack.io' }
 	maven { url 'https://maven.kosmx.dev/' }
 	maven { url 'https://maven.shedaniel.me/' }
-	maven { url 'https://libs.azuredoom.com:4443/mods' }
+	maven { url 'https://maven.azuredoom.com/mods' }
 	maven { url 'https://maven.terraformersmc.com/' }
 	maven {
 		name = 'Modrinth'
@@ -33,15 +33,20 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 }
-
+fabricApi {
+	configureDataGeneration {
+		modId = "hexblade"
+	}
+}
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modCompileOnly fileTree(dir: "run/mods", includes: ['*.jar'])
+	modImplementation fileTree(dir: "run/mods", includes: ['*.jar'])
 
 	// Fabric
 	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation("maven.modrinth:spell-engine:${project.spell_engine_version}")
 
 	// Dependencies
 	include(implementation("com.github.ZsoltMolnarrr:TinyConfig:${project.tiny_config_version}"))
@@ -49,7 +54,6 @@ dependencies {
 	modImplementation("maven.modrinth:runes:${project.runes_version}")
 	modImplementation "mod.azure.azurelib:azurelib-fabric-1.21.1:2.3.19"
 
-	modImplementation("maven.modrinth:spell-engine:${project.spell_engine_version}")
 	modImplementation("maven.modrinth:spell-power:${project.spell_power_version}")
 //    modImplementation(files("run/mods/dev/spell_engine-${project.spell_engine_version}.jar"))
 //    modImplementation(files("run/mods/dev/spell_power-${project.spell_power_version}.jar"))

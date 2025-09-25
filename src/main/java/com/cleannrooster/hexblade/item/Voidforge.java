@@ -18,7 +18,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.spell_engine.api.item.ConfigurableAttributes;
 import net.spell_power.api.SpellSchool;
 import net.spell_power.api.SpellSchools;
 import org.jetbrains.annotations.Nullable;
@@ -60,8 +59,7 @@ public class Voidforge extends Starforge  {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        tooltip.add(Text.translatable("Triggers Elemental Novas on hit, with a 1 second base cooldown and a 0.8 coefficient."));
-        tooltip.add(Text.translatable("Requires runes of the right type, or Spell Infinity."));
+
         tooltip.add(Text.translatable("A weapon born of nothingness,").formatted(Formatting.RED).formatted(Formatting.ITALIC));
         tooltip.add(Text.translatable("can only create more nothingness.").formatted(Formatting.RED).formatted(Formatting.ITALIC));
 

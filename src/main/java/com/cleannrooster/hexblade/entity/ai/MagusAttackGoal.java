@@ -17,10 +17,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.WorldScheduler;
-import net.spell_engine.particle.Particles;
+import net.spell_engine.fx.SpellEngineParticles;
 import net.spell_engine.utils.SoundHelper;
 import net.spell_engine.utils.TargetHelper;
+import net.spell_engine.utils.WorldScheduler;
 import net.spell_power.api.SpellDamageSource;
 
 import java.util.EnumSet;
@@ -63,6 +63,10 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
 
     public boolean canStart() {
         long l = this.mob.getWorld().getTime();
+
+        if( mob.age < 100){
+            return false;
+        }
         this.cooldown--;
         if (l - this.lastUpdateTime < 20L || this.cooldown > 0) {
             return false;
@@ -100,14 +104,16 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
         this.nontriggeredtime = 0;
         this.end = false;
         this.cooldown = 0;
-        if(mob.getTarget() != null) {
-            this.mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, this.mob.getTarget().getEyePos());
+        if(mob.getTarget() != null && !this.mob.positions.isEmpty()) {
+            this.mob.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, this.mob.positions.get(0));
             if( !this.isTargetTooClose(this.mob)) {
-                Vec3d vec31 = new Vec3d(mob.getTarget().getX() - this.mob.getX(), 0, mob.getTarget().getZ() - this.mob.getZ());
-                Vec3d vec3 = new Vec3d(vec31.normalize().x * 1, 0.5, vec31.normalize().z * 1);
-                this.mob.setPosition(this.mob.getPos().add(0, 1, 0));
-                this.mob.setOnGround(false);
-                this.mob.setVelocity(vec3);
+                if(!mob.positions.isEmpty()) {
+                    Vec3d vec31 = new Vec3d(mob.positions.get(0).getX() - this.mob.getX(), 0, mob.positions.get(0).getZ() - this.mob.getZ());
+                    Vec3d vec3 = new Vec3d(vec31.normalize().x * 1, 0.5, vec31.normalize().z * 1);
+                    this.mob.setPosition(this.mob.getPos().add(0, 1, 0));
+                    this.mob.setOnGround(false);
+                    this.mob.setVelocity(vec3);
+                }
             }
             mob.getDataTracker().set(Magus.TIER,2);
         }
@@ -133,18 +139,19 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
 
         this.mob.getLookControl().tick();
 
-        if(this.time == 5){
+
+        if(this.time == 10+5){
             this.mob.triggerAnim("slashtwo","slashtwo");
             this.spawnParticlesSlash(-90,-90);
             this.attack(false);
         }
-        if(this.time == 10){
+        if(this.time == 10+10){
             this.mob.triggerAnim("slashthree","slashthree");
             this.spawnParticlesSlash(-90,0);
             this.attack(true);
 
         }
-        if(this.time == 13){
+        if(this.time == 10+13){
             if(this.mob.getRandom().nextFloat() > 0.25){
                 this.end = true;
             }
@@ -152,31 +159,31 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
 
             }
         }
-        if(this.time == 15){
+        if(this.time == 10+15){
             this.mob.triggerAnim("slashone","slashone");
             this.spawnParticlesSlash(-90,45);
             this.attack(false);
 
         }
-        if(this.time == 20){
+        if(this.time == 10+20){
             this.mob.triggerAnim("slashtwo","slashtwo");
             this.spawnParticlesSlash(-90,-90);
             this.attack(false);
 
         }
-        if(this.time == 25){
+        if(this.time == 10+25){
             this.mob.triggerAnim("slashthree","slashthree");
             this.spawnParticlesSlash(-90,0);
             this.attack(true);
 
         }
-        if(this.time == 30){
+        if(this.time == 10+30){
             this.mob.triggerAnim("ryuenjin","ryuenjin");
             this.spawnParticlesSlash(-90,180);
             this.attack(true);
 
         }
-        if(this.time == 35){
+        if(this.time == 10+35){
             this.end = true;
         }
         if(this.mob.isOnGround()){
@@ -185,7 +192,10 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
             }
         }
         if(triggered) {
-            if(this.time == 0){
+            if(this.time == 0) {
+                this.mob.triggerAnim("walk2","walk2");
+            }
+            if(this.time == 10+0){
                 this.mob.triggerAnim("slashone","slashone");
                 this.spawnParticlesSlash(-90,45);
                 this.attack(false);
@@ -236,10 +246,10 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
                         for(ServerPlayerEntity player : PlayerLookup.tracking(this.mob)) {
                             if (finalIi % 2 == 1) {
                                 //serverWorld.spawnParticles(player, Particles.snowflake.particleType,true, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0, 0, 0, 0);
-                                serverWorld.spawnParticles(player , Particles.snowflake.particleType,true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
+                                serverWorld.spawnParticles(player , SpellEngineParticles.snowflake.particleType(),true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
                             }
                             //serverWorld.spawnParticles(player,Particles.frost_shard.particleType, true, vec3d3.getX(), vec3d3.getY(), vec3d3.getZ(), 1, 0, 0, 0, 0);
-                            serverWorld.spawnParticles(player,Particles.frost_shard.particleType, true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
+                            serverWorld.spawnParticles(player,SpellEngineParticles.frost_shard.particleType(), true, vec3d4.getX(), vec3d4.getY(), vec3d4.getZ(), 1, 0, 0, 0, 0);
                         }
 
                     }
@@ -252,7 +262,7 @@ public class MagusAttackGoal<E extends Magus> extends Goal{
     }
     protected void attack(boolean narrow) {
         SoundHelper.playSoundEvent(this.mob.getWorld(), this.mob, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP);
-        Spell.Release.Target.Area area = new Spell.Release.Target.Area();
+        Spell.Target.Area area = new Spell.Target.Area();
         area.angle_degrees = 180;
         if(narrow){
             area.angle_degrees = 90;

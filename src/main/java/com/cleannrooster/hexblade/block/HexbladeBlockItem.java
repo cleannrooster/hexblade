@@ -39,7 +39,7 @@ public class HexbladeBlockItem extends BlockItem {
                 }
                 if (resourceKey == Hexblade.DIMENSIONKEY) {
                     TeleportTarget target = new TeleportTarget(serverWorld,
-                            new net.minecraft.util.math.Vec3d(0, 150, 0),
+                            new net.minecraft.util.math.Vec3d(0, 65, 0),
                             net.minecraft.util.math.Vec3d.ZERO,
                             0.0F,
                             0.0F,

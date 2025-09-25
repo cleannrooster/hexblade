@@ -1,5 +1,6 @@
 package com.cleannrooster.hexblade.entity.ai;
 
+import com.cleannrooster.hexblade.entity.Magister;
 import com.cleannrooster.hexblade.entity.Magus;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.ai.goal.Goal;
@@ -23,6 +24,9 @@ public class MagusFollowGoal extends Goal {
     }
 
     public boolean canStart() {
+        if( magus.age < 100){
+            return false;
+        }
         return this.magus.getTarget() != null && this.magus.getTarget().isAlive();
     }
 
@@ -40,10 +44,19 @@ public class MagusFollowGoal extends Goal {
     }
 
     public void tick() {
-        if(this.magus.getTarget() != null) {
-            this.magus.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, this.magus.getTarget().getEyePos());
+        if(this.magus.getTarget() != null && this.magus instanceof Magus magus && !magus.positions.isEmpty()) {
+            this.magus.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, magus.positions.get(0));
             this.magus.getNavigation().startMovingTo(this.magus.getTarget(), this.speed);
 
+        }
+        else {
+            if (this.magus instanceof Magister magister && magister.isCaster()) {
+                if (this.magus.getTarget() != null && (magister.distanceTo(this.magus.getTarget()) > 4 && magister.distanceTo(this.magus.getTarget()) < 24)) {
+                    this.magus.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, magus.getTarget().getPos());
+
+                    this.magus.getNavigation().stop();
+                }
+            }
         }
     }
 }

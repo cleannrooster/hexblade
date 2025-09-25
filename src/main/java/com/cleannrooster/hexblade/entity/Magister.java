@@ -2,7 +2,9 @@ package com.cleannrooster.hexblade.entity;
 
 import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.hexblade.entity.ai.*;
+import com.cleannrooster.hexblade.entity.ai.FollowGroupLeaderGoal;
 import com.cleannrooster.hexblade.invasions.attackevent;
+import com.cleannrooster.hexblade.invasions.piglinsummon;
 import com.cleannrooster.spellblades.SpellbladesAndSuch;
 import com.cleannrooster.spellblades.items.Spellblade;
 import com.google.common.collect.ImmutableList;
@@ -11,28 +13,35 @@ import com.mojang.serialization.Dynamic;
 import mod.azure.azurelib.common.api.common.animatable.GeoEntity;
 import mod.azure.azurelib.common.internal.common.util.AzureLibUtil;
 import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
+import mod.azure.azurelib.core.animation.*;
 import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.core.math.functions.limit.Min;
 import mod.azure.azurelib.core.object.PlayState;
 import net.minecraft.block.BlockState;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.brain.task.LookTargetUtil;
+import net.minecraft.entity.ai.brain.task.WalkTowardsLookTargetTask;
+import net.minecraft.entity.ai.brain.task.WalkTowardsPosTask;
+import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.MobNavigation;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.SchoolingFishEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.HoeItem;
@@ -41,6 +50,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -52,7 +64,10 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.Merchant;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
@@ -60,26 +75,32 @@ import net.minecraft.village.TradedItem;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.WorldScheduler;
+import net.spell_engine.api.spell.registry.SpellRegistry;
+import net.spell_engine.internals.SpellHelper;
 import net.spell_engine.utils.SoundHelper;
 import net.spell_engine.utils.TargetHelper;
+import net.spell_engine.utils.WorldScheduler;
 import net.spell_power.api.SpellDamageSource;
 import net.spell_power.api.SpellSchool;
 import net.spell_power.api.SpellSchools;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.cleannrooster.hexblade.Hexblade.*;
+import static com.cleannrooster.hexblade.effect.Effects.HEXED;
+import static com.cleannrooster.hexblade.effect.Effects.MAGISTERFRIEND;
 
 public class Magister extends HostileEntity implements InventoryOwner, GeoEntity, Merchant {
     public PlayerEntity nemesis;
+    public int cooldown = 0;
+    public boolean retreating = false;
+
     public boolean isthinking = false;
     public boolean isScout = false;
+    public int rank = 0;
     private boolean hasntthrownitems = true;
     private boolean firstattack = false;
     private boolean secondattack = false;
@@ -89,9 +110,20 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
     private PlayerEntity tradingplayer;
     float damagetakensincelastthink = 0;
     public int experiencePoints = 25;
+    boolean isLeader;
+    private Magister leader;
+    private UUID groupUUID;
+    private int leaderID;
+
 
     public Magister(EntityType<? extends Magister> p_34652_, World p_34653_) {
         super(p_34652_, p_34653_);
+        this.lookControl = new MinibossLookControl(this);
+    }
+
+    @Override
+    public double getTick(Object entity) {
+        return GeoEntity.super.getTick(entity);
     }
 
     public void setTemporary(boolean temporary) {
@@ -105,19 +137,20 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
     private final SimpleInventory inventory = new SimpleInventory(8);
     private static final Set<Item> WANTED_ITEMS = ImmutableSet.of(Items.POTATO, Items.CARROT, Items.WHEAT, Items.WHEAT_SEEDS, Items.BEETROOT, Items.BEETROOT_SEEDS);
     public boolean returninghome = false;
-    public boolean isleader = false;
 
     public int homecount = 0;
     public int homecount2 = 0;
     public PlayerEntity hero = null;
     public boolean canGiveGifts = false;
     private AnimatableInstanceCache factory = AzureLibUtil.createInstanceCache(this);
-    public static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("animation.hexblade.new");
-    public static final RawAnimation ATTACK2 = RawAnimation.begin().thenPlay("animation.hexblade.new2");
-    public static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.hexblade.walk");
-    public static final RawAnimation WALK2 = RawAnimation.begin().thenLoop("animation.hexblade.walk2");
-    public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
-    public static final RawAnimation IDLE1 = RawAnimation.begin().thenPlay("idle");
+
+    public static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.unknown.walk");
+    public static final RawAnimation WALK2H = RawAnimation.begin().thenLoop("animation.unknown.walk_2h");
+
+
+    public static final RawAnimation ATTACK = RawAnimation.begin().then("animation.mob.swing1", Animation.LoopType.PLAY_ONCE);
+    public static final RawAnimation ATTACK2 = RawAnimation.begin().then("animation.mob.swing2", Animation.LoopType.PLAY_ONCE);
+
     protected static final ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.DOORS_TO_CLOSE, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEARBY_ADULT_PIGLINS, MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.PATH, MemoryModuleType.ANGRY_AT, MemoryModuleType.UNIVERSAL_ANGER, MemoryModuleType.AVOID_TARGET, MemoryModuleType.ADMIRING_ITEM, MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, MemoryModuleType.ADMIRING_DISABLED, MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, MemoryModuleType.CELEBRATE_LOCATION,MemoryModuleType.NEAREST_ATTACKABLE, MemoryModuleType.DANCING, MemoryModuleType.HUNTED_RECENTLY, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MemoryModuleType.NEAREST_HOSTILE, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, MemoryModuleType.RIDE_TARGET, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MemoryModuleType.ATE_RECENTLY, MemoryModuleType.NEAREST_REPELLENT);
     protected static final ImmutableList<SensorType<? extends Sensor<? super Magister>>> SENSOR_TYPES = ImmutableList.of(MagisterAI.MAGISTER_SENSOR_SENSOR_TYPE,SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.PIGLIN_SPECIFIC_SENSOR);
 
@@ -127,22 +160,139 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     @Override
     protected void initGoals() {
+        this.goalSelector.add(0, new SwimAroundGoal(this,0.7F,120));
 
-        this.goalSelector.add(2, new AttackGoalMagister<>(this));
-        this.goalSelector.add(1,new RangedAttackMagister<>(this,1.0F,8,24));
-        this.goalSelector.add(3, new MagusFollowGoal(this,1));
-        this.goalSelector.add(4, new WanderAroundFarGoal(this, 0.7));
+        this.goalSelector.add(1, new SwimGoal(this));
 
-        this.goalSelector.add(11, new SwimGoal(this));
-        this.goalSelector.add(12, new SwimAroundGoal(this,0.7F,120));
+        this.goalSelector.add(2,new RetreatGoal(this,1.2F));
 
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true, entity ->  !entity.hasStatusEffect(MAGISTERFRIEND) && this.getLastAttacker() != null && this.getLastAttacker().equals(entity)));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true,entity ->   !entity.hasStatusEffect(MAGISTERFRIEND)));
-        this.targetSelector.add(3, new ActiveTargetGoal<>(this, LivingEntity.class, true, entity ->  !(entity instanceof Magus || entity instanceof Magister)&& this.getLastAttacker() != null && this.getLastAttacker().equals(entity)));
+        this.goalSelector.add(3, new AttackGoalMagister<>(this));
+        this.goalSelector.add(4,new RangedAttackMagister<>(this,1.0F,2,32));
+        this.goalSelector.add(5, new FollowGroupLeaderGoal(this));
 
-        this.targetSelector.add(4, new ActiveTargetGoal<>(this, HostileEntity.class, true, entity ->  !(entity instanceof Magus || entity instanceof Magister)));
+
+        this.goalSelector.add(9, new WanderAroundFarMagisterGoal(this, 0.7));
+
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true, entity ->  !entity.hasStatusEffect(MAGISTERFRIEND.registryEntry) && this.getLastAttacker() != null && this.getLastAttacker().equals(entity) ));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true,entity ->   !entity.hasStatusEffect(MAGISTERFRIEND.registryEntry)));
+        this.targetSelector.add(3, new ActiveTargetGoal<>(this, LivingEntity.class, true, entity ->  !(entity instanceof Magus || entity instanceof Magister || entity instanceof CreeperEntity)&& this.getLastAttacker() != null && this.getLastAttacker().equals(entity)));
+
 
     }
+    public static class MinibossLookControl extends LookControl {
+        protected final MobEntity entity;
+        protected float maxYawChange;
+        protected float maxPitchChange;
+        protected int lookAtTimer;
+        protected double x;
+        protected double y;
+        protected double z;
+        public MinibossLookControl(MobEntity entity) {
+            super(entity);
+            this.entity = entity;
+        }
+
+        public void lookAt(Vec3d direction) {
+            this.lookAt(direction.x, direction.y, direction.z);
+        }
+
+        public void lookAt(Entity entity) {
+            this.lookAt(entity.getX(), getLookingHeightFor(entity), entity.getZ());
+        }
+
+        public void lookAt(Entity entity, float maxYawChange, float maxPitchChange) {
+            this.lookAt(entity.getX(), getLookingHeightFor(entity), entity.getZ(), maxYawChange, maxPitchChange);
+        }
+
+        public void lookAt(double x, double y, double z) {
+            this.lookAt(x, y, z, (float)this.entity.getMaxLookYawChange(), (float)this.entity.getMaxLookPitchChange());
+        }
+
+        public void lookAt(double x, double y, double z, float maxYawChange, float maxPitchChange) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.maxYawChange = 30;
+            this.maxPitchChange = 30;
+            this.lookAtTimer = 8;
+        }
+
+        public void tick() {
+            if (this.lookAtTimer > 0) {
+
+                this.getTargetYaw().ifPresent((yaw) -> {
+                    this.entity.setHeadYaw(this.changeAngle(this.entity.headYaw, yaw, this.maxYawChange));
+                    this.entity.prevHeadYaw = this.entity.headYaw;
+                });
+                this.getTargetPitch().ifPresent((pitch) -> {
+                    this.entity.setPitch(this.changeAngle(this.entity.getPitch(), pitch, this.maxPitchChange));
+                    this.entity.prevPitch = this.entity.getPitch();
+
+                });  } else {
+                this.entity.headYaw = this.changeAngle(this.entity.headYaw, this.entity.bodyYaw, 10.0F);
+            }
+
+            this.clampHeadYaw();
+        }
+        protected void clampHeadYaw() {
+            if (!this.entity.getNavigation().isIdle()) {
+                this.entity.headYaw = MathHelper.clampAngle(this.entity.headYaw, this.entity.bodyYaw, (float)this.entity.getMaxHeadRotation());
+            }
+
+        }
+
+        protected boolean shouldStayHorizontal() {
+            return false;
+        }
+
+        public boolean isLookingAtSpecificPosition() {
+            return this.lookAtTimer > 0;
+        }
+
+        public double getLookX() {
+            return this.x;
+        }
+
+        public double getLookY() {
+            return this.y;
+        }
+
+        public double getLookZ() {
+            return this.z;
+        }
+
+        protected Optional<Float> getTargetPitch() {
+            double d = this.x - this.entity.getX();
+            double e = this.y - this.entity.getEyeY();
+            double f = this.z - this.entity.getZ();
+            double g = Math.sqrt(d * d + f * f);
+            return !(Math.abs(e) > 9.999999747378752E-6) && !(Math.abs(g) > 9.999999747378752E-6) ? Optional.empty() : Optional.of((float)(-(MathHelper.atan2(e, g) * 57.2957763671875)));
+        }
+
+        protected Optional<Float> getTargetYaw() {
+            double d = this.x - this.entity.getX();
+            double e = this.z - this.entity.getZ();
+            return !(Math.abs(e) > 9.999999747378752E-6) && !(Math.abs(d) > 9.999999747378752E-6) ? Optional.empty() : Optional.of((float)(MathHelper.atan2(e, d) * 57.2957763671875) - 90.0F);
+        }
+
+        protected float changeAngle(float from, float to, float max) {
+            float f = MathHelper.subtractAngles(from, to);
+            float g = MathHelper.clamp(f, -max, max);
+            return from + g;
+        }
+
+        private static double getLookingHeightFor(Entity entity) {
+            return entity instanceof LivingEntity ? entity.getEyeY() : (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) / 2.0;
+        }
+    }
+
+    @Nullable
+    public Magister getFollowing(){
+        Optional<Magister> following = this.getGroup().stream().filter(mob -> { return mob.rank == this.rank-1;}).findFirst();
+
+        return this.rank == 1 ? this.getLeader(): following.orElse(null);
+    }
+
 
     @Override
     protected float getDropChance(EquipmentSlot equipmentSlot) {
@@ -150,10 +300,31 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
     }
 
     public boolean isCaster() {
-        return this.isCaster;
+        return this.getDataTracker().get(CASTER);
+    }
+    public boolean isLeader() {
+        return this.getDataTracker().get(LEADER);
+    }
+    public Magister  getLeader(){
+        Magister leader = null;
+
+        if(this.getWorld().getEntityById(this.getDataTracker().get(LEADERID)) instanceof Magister magister){
+            leader = magister;
+        }
+        return leader;
     }
 
+    @Override
+    public ItemStack getOffHandStack() {
+        if(this.isLeader()){
+            return new ItemStack(HEXBLADEITEM);
+        }
+        return super.getOffHandStack();
+    }
 
+    public boolean hasLeader(){
+        return this.getLeader() != null && this.getLeader().isAlive() && !this.isLeader();
+    }
     public boolean isScout() {
         return this.isScout;
     }
@@ -176,8 +347,16 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
         }
     }
+    public void pullInOtherMagisters(Stream<? extends Magister> fish) {
+        fish.forEach((fishx) -> {
+            fishx.joinGroupOf(this);
+        });
+    }
 
-
+    public Magister joinGroupOf(Magister groupLeader) {
+        this.leader = groupLeader;
+        return groupLeader;
+    }
     static boolean isNearestValidAttackTarget(Magister piglin, LivingEntity livingEntity) {
         return findNearestValidAttackTarget(piglin).filter((livingEntity2) -> {
             return livingEntity2 == livingEntity;
@@ -186,6 +365,16 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     public void writeCustomDataToNbt(NbtCompound compoundTag) {
 
+        if (this.getDataTracker().get(LEADER)) {
+            compoundTag.putBoolean("Leader", this.getDataTracker().get(LEADER));
+        } else {
+            compoundTag.putBoolean("Leader", false);
+
+        }
+
+        compoundTag.putInt("leaderID", this.getDataTracker().get(LEADERID));
+        this.getDataTracker().get(GROUPUUID).ifPresent(uuid1 ->
+                compoundTag.putUuid("Uuid", uuid1));
 
         if (this.isCaster) {
             compoundTag.putBoolean("Caster", true);
@@ -209,10 +398,52 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     }
 
+    @Override
+    public boolean canTarget(LivingEntity target) {
+        if(target instanceof Magister magister){
+            return false;
+        }
+        return super.canTarget(target);
+    }
 
+
+
+    public static final TrackedData<Boolean> LEADER;
+    public static final TrackedData<Boolean> CASTER;
+
+    public static final TrackedData<Integer> LEADERID;
+
+    public static final TrackedData<Optional<UUID>> GROUPUUID;
+
+    static {
+        LEADER = DataTracker.registerData(Magister.class, TrackedDataHandlerRegistry.BOOLEAN);
+        CASTER = DataTracker.registerData(Magister.class, TrackedDataHandlerRegistry.BOOLEAN);
+
+        LEADERID = DataTracker.registerData(Magister.class, TrackedDataHandlerRegistry.INTEGER);
+        GROUPUUID = DataTracker.registerData(Magister.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+
+    }
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(LEADER,false);
+        builder.add(CASTER,false);
+
+        builder.add(LEADERID,0);
+        builder.add(GROUPUUID,Optional.empty());
+
+    }
     public void readCustomDataFromNbt(NbtCompound compoundTag) {
         this.isTemporary = compoundTag.getBoolean("Temporary");
-
+        if (compoundTag.contains("Uuid")) {
+            this.dataTracker.set(GROUPUUID, Optional.of(compoundTag.getUuid("Uuid")));
+        }
+        if (compoundTag.contains("leaderID")) {
+            this.dataTracker.set(LEADERID, compoundTag.getInt("leaderID"));
+        }
+        if (compoundTag.contains("Leader")) {
+            this.dataTracker.set(LEADER, compoundTag.getBoolean("Leader"));
+        }
         this.isCaster = compoundTag.getBoolean("Caster");
         this.isScout = compoundTag.getBoolean("Scout");
         super.readCustomDataFromNbt(compoundTag);
@@ -246,15 +477,22 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
         return false;
     }
 
+
+
     @Override
     public void tickMovement() {
         tickHandSwing();
-
         super.tickMovement();
     }
 
+
+
     @Override
     public void tick() {
+        if(!this.getWorld().isClient()) {
+            cooldown++;
+        }
+
         if(this.nemesis != null){
             this.setTarget(nemesis);
         }
@@ -280,26 +518,15 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
             this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,5,4));
         }
 
-        if(this.getWorld() instanceof ServerWorld serverWorld && serverWorld.getEntitiesByType(Hexblade.REAVER,LivingEntity::isAlive).size()>32){
+
+
+
+
+        if (age > 4000 && !this.getWorld().isClient() && this.isTemporary() ) {
             this.playSoundIfNotSilent(SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT);
             this.discard();
         }
 
-
-
-        if (age > 1000 && !this.getWorld().isClient() && this.isTemporary() ) {
-            this.playSoundIfNotSilent(SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT);
-            this.discard();
-        }
-
-
-        this.attackTime++;
-        if (this.attackTime > 18) {
-            this.justattacked = false;
-            this.attackTime = 0;
-            this.firstattack = false;
-            this.secondattack = false;
-        }
 
 
 
@@ -333,11 +560,11 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     @Override
     protected void dropLoot(DamageSource damageSource, boolean bl) {
-        if(damageSource.getAttacker() instanceof PlayerEntity player && player.hasStatusEffect(Hexblade.HEXED)){
-            player.removeStatusEffect(Hexblade.HEXED);
+        if(damageSource.getAttacker() instanceof PlayerEntity player && player.hasStatusEffect(HEXED.registryEntry)){
+            player.removeStatusEffect(HEXED.registryEntry);
         }
-        if(damageSource.getAttacker() instanceof PlayerEntity player && player.hasStatusEffect(MAGISTERFRIEND)){
-            player.removeStatusEffect(MAGISTERFRIEND);
+        if(damageSource.getAttacker() instanceof PlayerEntity player && player.hasStatusEffect(MAGISTERFRIEND.registryEntry)){
+            player.removeStatusEffect(MAGISTERFRIEND.registryEntry);
         }
         super.dropLoot(damageSource, bl);
     }
@@ -353,6 +580,11 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
     }
 
     @Override
+    public boolean isInvulnerable() {
+        return this.isLeader() && !this.getGroup().isEmpty();
+    }
+
+    @Override
     public boolean damage(DamageSource damageSource, float f) {
         if(this.getMainHandStack().isEmpty() && this.age < 200){
             return false;
@@ -361,18 +593,18 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
             this.tryEquip(new ItemStack(com.cleannrooster.spellblades.items.Items.arcane_blade.item()));
 
         }
-        if(damageSource.getSource() instanceof PlayerEntity livingEntity && damageSource.getAttacker() instanceof PlayerEntity && livingEntity.hasStatusEffect(Hexblade.HEXED) && this.getHealth()/this.getMaxHealth() <= 0.5){
-            if(livingEntity.getStatusEffect(Hexblade.HEXED) != null ){
+        if(damageSource.getSource() instanceof PlayerEntity livingEntity && damageSource.getAttacker() instanceof PlayerEntity && livingEntity.hasStatusEffect(HEXED.registryEntry) && this.getHealth()/this.getMaxHealth() <= 0.5){
+            if(livingEntity.getStatusEffect(HEXED.registryEntry) != null ){
 
                 if(livingEntity instanceof PlayerEntity player && !player.getWorld().isClient()){
 
                         attackeventArrayList.add(new attackevent(player.getWorld(),player));
-                        livingEntity.removeStatusEffect(HEXED);
+                        livingEntity.removeStatusEffect(HEXED.registryEntry);
                 }
             }
         }
-        if(damageSource.getSource() instanceof PlayerEntity player && damageSource.getAttacker() instanceof PlayerEntity && player.hasStatusEffect(MAGISTERFRIEND) && this.getHealth()/this.getMaxHealth() <= 0.5){
-            player.removeStatusEffect(MAGISTERFRIEND);
+        if(damageSource.getSource() instanceof PlayerEntity player && damageSource.getAttacker() instanceof PlayerEntity && player.hasStatusEffect(MAGISTERFRIEND.registryEntry) && this.getHealth()/this.getMaxHealth() <= 0.5){
+            player.removeStatusEffect(MAGISTERFRIEND.registryEntry);
         }
         return super.damage(damageSource, f);
 
@@ -380,7 +612,7 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 50.0D).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3499999940395355D).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4.0D).add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE,0.5);
+        return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 50.0D).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3499999940395355D).add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE,0.5);
     }
     protected void tickHandSwing() {
         int i = 18;
@@ -416,31 +648,41 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
         }
 
     }
+    public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("animation.mob.idle");
+    public static final RawAnimation IDLE2H = RawAnimation.begin().thenPlay("animation.unknown.idle_2h");
+
+    public boolean   swingBool;
+
     @Override
     public boolean tryAttack(Entity entity) {
-        if(this.isScout()){
-            return false;
+        if(entity instanceof LivingEntity living){
+            RegistryEntry<Spell> spell = null;
+            if(this.getMagicSchool().equals(SpellSchools.FIRE)){
+                spell = SpellRegistry.from(living.getWorld()).getEntry(Identifier.of(MOD_ID,"flame_slash")).get();
+            }
+            if(this.getMagicSchool().equals(SpellSchools.ARCANE)){
+                spell = SpellRegistry.from(living.getWorld()).getEntry(Identifier.of(MOD_ID,"amethyst_slash")).get();
+            }
+            if(this.getMagicSchool().equals(SpellSchools.FROST)){
+                spell = SpellRegistry.from(living.getWorld()).getEntry(Identifier.of(MOD_ID,"frost_slash")).get();
+            }
+            if(spell != null) {
+                SpellHelper.performImpacts(living.getWorld(), this, living, living, spell,spell.value().impacts, new SpellHelper.ImpactContext());
+            }
         }
-        this.swingHand(Hand.MAIN_HAND);
-        if(this.getWorld() instanceof ServerWorld serverWorld) {
-            ((WorldScheduler) serverWorld).schedule(12, () -> {
-                SoundHelper.playSoundEvent(this.getWorld(), this, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP);
-                Spell.Release.Target.Area area = new Spell.Release.Target.Area();
-                area.angle_degrees = 180;
-                Predicate<Entity> selectionPredicate = (target) -> {
-                    return !(target instanceof Magister);
-                };
-                List<Entity> list = TargetHelper.targetsFromArea(this, this.getBoundingBox().getCenter(), 2.5F, area, selectionPredicate);
-                for (Entity entities : list) {
-                    if (entities.damage(SpellDamageSource.mob(getMagicSchool(), this), (float) this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) / 2)) {
-                        entities.timeUntilRegen = 0;
-                        entities.damage(this.getWorld().getDamageSources().mobAttack(this), (float) this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) / 2);
-                    }
-                }
-            });
+        if(swingBool){
+            ((Magister)this).triggerAnim("swing1","swing1");
+            swingBool = false;
+            return super.tryAttack(entity);
 
         }
-        return true;
+        else{
+            ((Magister)this).triggerAnim("swing2","swing2");
+            swingBool = true;
+            return super.tryAttack(entity);
+
+        }
+
     }
 
     protected static boolean canHarvest(Magister piglin){
@@ -454,9 +696,31 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     }
 
+    @Override
+    public boolean isTeammate(Entity other) {
+        if(other instanceof Magister || other instanceof Magus){
+            return true;
+        }
+        return super.isTeammate(other);
+    }
 
     protected void mobTick() {
         MagisterAI.updateActivity(this);
+
+        {
+
+            if (this.isLeader()&&((this.getGroup().size() < 4 && this.age > 100) || this.age > 1000)) {
+                piglinsummon.summonNetherPortal(this.getWorld(),this,true).ifPresent((hexbladePortal -> {
+                    if(this.cooldown > 100) {
+
+                        hexbladePortal.leaderID=this.getId();
+                        this.getWorld().spawnEntity(hexbladePortal);
+                        this.cooldown = 0;
+                    }
+                }));
+
+            }
+        }
         super.mobTick();
     }
     @Override
@@ -464,25 +728,8 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
         return this.inventory;
     }
 
-    private PlayState predicate(AnimationState<Magister> state) {
-        boolean second = this.random.nextBoolean();
-        if(this.handSwinging && !second) {
-            state.getController().forceAnimationReset();
-            this.secondattack = true;
-            this.handSwinging = false;
-            return state.setAndContinue(ATTACK);
-        }
-        if(this.handSwinging) {
-            state.getController().forceAnimationReset();
 
-            this.secondattack = false;
-            this.handSwinging = false;
-            return state.setAndContinue(ATTACK2);
-        }
 
-        return PlayState.CONTINUE;
-
-    }
 
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand interactionHand) {
@@ -498,8 +745,8 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
 
     private PlayState predicate2(AnimationState<Magister> state) {
         if(state.isMoving()){
-            if(this.isAttacking()){
-                return state.setAndContinue(WALK2);
+            if(this.isCaster()){
+                return state.setAndContinue(WALK2H);
 
 
             }
@@ -517,10 +764,12 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
         animationData.add(new AnimationController<Magister>(this,"walk",
                 0,this::predicate2)
         );
-        animationData.add(new AnimationController<Magister>(this,"attack",
-                0,this::predicate)
-        );
-
+        animationData.add(
+                new AnimationController<>(this, "swing1", event -> PlayState.CONTINUE)
+                        .triggerableAnim("swing1", ATTACK));
+        animationData.add(
+                new AnimationController<>(this, "swing2", event -> PlayState.CONTINUE)
+                        .triggerableAnim("swing2", ATTACK2));
     }
 
     @Override
@@ -624,6 +873,47 @@ public class Magister extends HostileEntity implements InventoryOwner, GeoEntity
     @Override
     public boolean isClient() {
         return false;
+    }
+
+
+
+    public boolean isCloseEnoughToLeader() {
+        return this.getLeader() != null && this.distanceTo(this.getLeader()) < 8;
+    }
+
+    public boolean hasOtherFishInGroup() {
+       return !this.getGroup().stream().filter(magister -> magister != null && magister.isAlive()).toList().isEmpty();
+    }
+    public UUID getGroupUUID(){
+        UUID id = UUID.randomUUID();
+        if(this.getDataTracker().get(GROUPUUID).isPresent()){
+            return this.getDataTracker().get(GROUPUUID).get();
+
+        }
+        return id;
+    }
+
+    public void setGroupUUID(UUID groupUUID) {
+        this.groupUUID = groupUUID;
+    }
+    public void setGroup(UUID groupUUID){
+        this.getDataTracker().set(GROUPUUID,Optional.of(groupUUID));
+    }
+
+    public List<Magister> getGroup() {
+        List<Magister> group = new ArrayList<>();
+        if(this.getServer() != null) {
+            this.getServer().getWorlds().forEach(serverWorld -> serverWorld.iterateEntities().forEach(entity -> {
+                if (entity instanceof Magister magister && !magister.isLeader() &&  magister.getGroupUUID() == this.getGroupUUID() && magister.isAlive()) {
+                    group.add(magister);
+                }
+            }));
+        }
+        return group;
+    }
+
+    public void setLeader(int leaderUUid) {
+        this.getDataTracker().set(LEADERID,leaderUUid);
     }
 }
 

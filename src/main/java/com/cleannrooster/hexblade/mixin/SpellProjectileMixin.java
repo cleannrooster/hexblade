@@ -1,11 +1,11 @@
 package com.cleannrooster.hexblade.mixin;
 
+import com.cleannrooster.hexblade.Hexblade;
 import com.cleannrooster.spellblades.SpellbladesAndSuch;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.Identifier;
-import net.spell_engine.api.spell.SpellInfo;
+import net.spell_engine.api.spell.registry.SpellRegistry;
 import net.spell_engine.entity.SpellProjectile;
-import net.spell_engine.internals.SpellRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ public class SpellProjectileMixin {
     @Inject(at = @At("TAIL"), method = "tick", cancellable = true)
     public  void tickSpellblade(CallbackInfo callbackInfo) {
         SpellProjectile entity = (SpellProjectile) (Object) this;
-        if(entity.getSpellInfo() != null && entity.getSpellInfo().equals(new SpellInfo(SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID,"arcane_swirl")),Identifier.of(SpellbladesAndSuch.MOD_ID,"arcane_swirl")))){
+        if(entity.getSpellEntry() != null && entity.getSpellEntry().equals(SpellRegistry.from(entity.getWorld()).getEntry(Identifier.of(Hexblade.MOD_ID,"amethyst_slash2")).get())){
             {
                 double x = (entity.age/16F)*cos(entity.age/5F);
                 double z = (entity.age/16F)*sin(entity.age/5F);
@@ -32,10 +32,10 @@ public class SpellProjectileMixin {
             }
 
         }
-        if(entity.getSpell() != null && (entity.getSpell().equals(SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID,"arcane_missile"))) ||
-                entity.getSpell().equals(SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID,"flameslash")))||
-                entity.getSpell().equals(SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID,"frostbolt"))) ||
-                entity.getSpell().equals(SpellRegistry.getSpell(Identifier.of(SpellbladesAndSuch.MOD_ID,"fireball"))))){
+        if(entity.getSpellEntry() != null && (
+                entity.getSpellEntry().equals(SpellRegistry.from(entity.getWorld()).getEntry(Identifier.of(Hexblade.MOD_ID,"flame_slash")).get())||
+                entity.getSpellEntry().equals(SpellRegistry.from(entity.getWorld()).getEntry(Identifier.of(Hexblade.MOD_ID,"frost_slash")).get()) ||
+                entity.getSpellEntry().equals(SpellRegistry.from(entity.getWorld()).getEntry(Identifier.of(Hexblade.MOD_ID,"amethyst_slash")).get()))){
             if(entity.age > 10){
                 entity.setFollowedTarget(null);
             }

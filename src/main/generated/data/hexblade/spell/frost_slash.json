@@ -1,0 +1,124 @@
+{
+  "school": "spell_power:frost",
+  "range": 64.0,
+  "tier": 3,
+  "learn": {},
+  "active": {
+    "scroll": {},
+    "cast": {
+      "duration": 6.0,
+      "channel_ticks": 3,
+      "animation": "spell_engine:flameslash",
+      "sound": {
+        "id": "spell_engine:generic_frost_casting"
+      },
+      "particles": [
+        {
+          "particle_id": "spell_engine:magic_frost_spell_ascend",
+          "origin": "FEET",
+          "shape": "WIDE_PIPE",
+          "count": 1.0,
+          "min_speed": 0.05,
+          "max_speed": 0.1
+        }
+      ]
+    }
+  },
+  "deliver": {
+    "type": "PROJECTILE",
+    "projectile": {
+      "projectile": {
+        "divergence": 15.0,
+        "homing_angle": 10.0,
+        "homing_after_absolute_distance": 8.0,
+        "homing_after_relative_distance": 0.4,
+        "perks": {
+          "ricochet": 2
+        },
+        "client_data": {
+          "travel_particles": [
+            {
+              "particle_id": "spell_engine:magic_frost_spark_float",
+              "origin": "CENTER",
+              "shape": "CIRCLE",
+              "count": 2.0,
+              "min_speed": 0.05,
+              "max_speed": 0.1,
+              "angle": 360.0
+            },
+            {
+              "particle_id": "spell_engine:magic_frost_spark_float",
+              "origin": "CENTER",
+              "shape": "CIRCLE",
+              "count": 2.0,
+              "min_speed": 0.05,
+              "max_speed": 0.1,
+              "angle": 360.0
+            }
+          ],
+          "model": {
+            "model_id": "spellbladenext:projectile/gladius"
+          }
+        }
+      }
+    }
+  },
+  "impacts": [
+    {
+      "school": "spell_power:frost",
+      "target_modifiers": [
+        {
+          "conditions": [
+            {
+              "entity_type": "#minecraft:freeze_hurts_extra_types"
+            }
+          ],
+          "modifier": {
+            "power_multiplier": -0.3
+          }
+        },
+        {
+          "conditions": [
+            {
+              "entity_type": "#minecraft:freeze_hurts_extra_types"
+            }
+          ],
+          "modifier": {
+            "power_multiplier": 0.3
+          }
+        }
+      ],
+      "action": {
+        "type": "DAMAGE",
+        "damage": {
+          "spell_power_coefficient": 1.8,
+          "knockback": 0.0
+        }
+      },
+      "particles": [
+        {
+          "particle_id": "spell_engine:magic_frost_impact_burst",
+          "origin": "CENTER",
+          "shape": "CIRCLE",
+          "rotation": "LOOK",
+          "count": 20.0,
+          "min_speed": 0.2,
+          "max_speed": 0.7,
+          "angle": 360.0
+        }
+      ],
+      "sound": {
+        "id": "spell_engine:generic_frost_impact"
+      }
+    }
+  ],
+  "cost": {
+    "cooldown": {
+      "duration": 4.0,
+      "proportional": true
+    },
+    "item": {
+      "id": "runes:frost_stone"
+    }
+  }
+}

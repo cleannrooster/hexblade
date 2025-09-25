@@ -1,0 +1,20 @@
+{
+  "values": [
+    {
+      "id": "spellbladenext:magus_head",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:magus_chest",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:magus_legs",
+      "required": false
+    },
+    {
+      "id": "spellbladenext:magus_feet",
+      "required": false
+    }
+  ]
+}
