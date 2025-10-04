@@ -57,19 +57,19 @@
     "ground": {
       "translation": [
         0,
-        -34,
+        -27,
         0
       ]
     },
     "gui": {
       "rotation": [
-        0,
-        -141,
+        35,
+        -135.5,
         0
       ],
       "translation": [
         0.25,
-        -23,
+        -16,
         0
       ],
       "scale": [
@@ -93,7 +93,7 @@
     "fixed": {
       "translation": [
         0,
-        -33,
+        -28.75,
         0
       ]
     }

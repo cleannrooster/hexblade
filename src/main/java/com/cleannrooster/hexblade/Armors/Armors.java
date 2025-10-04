@@ -17,10 +17,13 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.config.ArmorSetConfig;
 import net.spell_engine.api.config.AttributeModifier;
+import net.spell_engine.api.entity.SpellEngineAttributes;
 import net.spell_engine.api.item.Equipment;
 import net.spell_engine.api.item.armor.Armor;
 import net.spell_engine.internals.SpellHelper;
+import net.spell_power.api.SpellPower;
 import net.spell_power.api.SpellPowerMechanics;
+import net.spell_power.api.SpellResistance;
 import net.spell_power.api.SpellSchools;
 import org.w3c.dom.Attr;
 
@@ -297,26 +300,26 @@ public class Armors {
             ArmorSetConfig.with(
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.2F),
-                                    AttributeModifier.multiply(SpellPowerMechanics.HASTE.id, 0.06F),
+                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(6)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(5)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.ARCANE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ),3)
@@ -330,26 +333,26 @@ public class Armors {
             ArmorSetConfig.with(
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.04F),
-                                    AttributeModifier.multiply(SpellPowerMechanics.HASTE.id, 0.06F),
+                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(6)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(5)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FIRE.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ),3)
@@ -363,26 +366,26 @@ public class Armors {
             ArmorSetConfig.with(
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellPowerMechanics.CRITICAL_CHANCE.id, 0.04F),
-                                    AttributeModifier.multiply(SpellPowerMechanics.CRITICAL_DAMAGE.id, 0.2F),
+                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(6)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(5)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             )),
                     new ArmorSetConfig.Piece(2)
                             .addAll(List.of(
-                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.20F),
-                                    AttributeModifier.multiply(Identifier.of(EntityAttributes.GENERIC_ATTACK_DAMAGE.getIdAsString()),0.04F),
+                                    AttributeModifier.multiply(SpellSchools.FROST.id, 0.15F),
+                                    AttributeModifier.bonus(SpellResistance.Attributes.GENERIC.id,4F),
                                     AttributeModifier.bonus(Identifier.of(ReabsorptionInit.MOD_ID,"reabsorption"), 2.5F)
                             ))
             ),3)

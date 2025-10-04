@@ -135,7 +135,7 @@ public class Hexblade implements ModInitializer {
 	public static final Identifier SINCELASTHEX = Identifier.of(MOD_ID, "threat");
 	public static final Identifier HEXRAID = Identifier.of(MOD_ID, "hex");
 	public static Item MAGUS_SPAWN_EGG ;
-	public static Item MAGISTER_EGG ;z
+	public static Item MAGISTER_EGG ;
 	public static final GameRules.Key<GameRules.BooleanRule> SHOULD_INVADE = GameRuleRegistry.register("hexbladeInvade", GameRules.Category.MOBS, GameRuleFactory.createBooleanRule(true));
 
 	public static final RegistryKey<World> DIMENSIONKEY = RegistryKey.of(RegistryKeys.WORLD,Identifier.of(Hexblade.MOD_ID,"glassocean"));
@@ -148,7 +148,7 @@ public class Hexblade implements ModInitializer {
 
 	public static ItemGroup SPELLBLADES;
 	public static ConfigManager<ConfigFile.Equipment> itemConfig = new ConfigManager<ConfigFile.Equipment>
-			("items_v5", Default.itemConfig)
+			("items_v6", Default.itemConfig)
 			.builder()
 			.setDirectory(MOD_ID)
 			.sanitize(true)
@@ -257,12 +257,12 @@ public class Hexblade implements ModInitializer {
 
 
 					if (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(HEXRAID)) > 0 && !player.hasStatusEffect(PORTALSICKNESS.registryEntry)) {
-						if (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)) == 9) {
+						if (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)) == 19) {
 							player.sendMessage(Text.translatable("Your use of magic has not gone unnoticed.").formatted(Formatting.LIGHT_PURPLE));
 						}
 						player.increaseStat(SINCELASTHEX, 1);
 
-							if (!player.hasStatusEffect(HEXED.registryEntry) && player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)) > 10 && player.getRandom().nextFloat() < config.spawnmodifier* 0.01 * (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(HEXRAID)) / 100F) * Math.pow((1.02930223664), player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)))) {
+							if (!player.hasStatusEffect(HEXED.registryEntry) && player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)) > 20 && player.getRandom().nextFloat() < config.spawnmodifier* 0.01 * (player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(HEXRAID)) / 200F) * Math.pow((1.02930223664), player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(SINCELASTHEX)))) {
 
 								Optional<BlockPos> pos2 = BlockPos.findClosest(player.getBlockPos(), 64, 128,
 										blockPos -> player.getWorld().getBlockState(blockPos).getBlock().equals(HEXBLADE));

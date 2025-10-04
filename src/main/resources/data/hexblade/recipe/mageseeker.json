@@ -1,22 +1,15 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "key": {
-    "A": {
-      "item": "minecraft:black_wool"
-    },
-    "D": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "S": {
-      "item": "minecraft:leather"
-    }
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "spellbladenext:runefrost_ingot"
   },
-  "pattern": [
-    "AAA",
-    "SDS",
-    "A A"
-  ],
+  "base": {
+    "item": "minecraft:diamond_helmet"
+  },
   "result": {
     "id": "spellbladenext:frozen_head"
+  },
+  "template": {
+    "item": "runes:frost_stone"
   }
 }

@@ -11,16 +11,7 @@ public class MagisterArmorItemModel extends GeoModel<MagisterArmor> {
     @Override
     public Identifier getModelResource(MagisterArmor orb) {
         if(orb.getSlotType() == EquipmentSlot.HEAD){
-            if(orb.getMagicSchool().equals(SpellSchools.ARCANE)){
 
-                    return Identifier.of(Hexblade.MOD_ID,"geo/magebane.geo.json");
-
-
-            }
-            if(orb.getMagicSchool().equals(SpellSchools.FROST)){
-                return Identifier.of(Hexblade.MOD_ID,"geo/mageseeker.geo.json");
-
-            }
             return Identifier.of(Hexblade.MOD_ID,"geo/magebreaker.geo.json");
 
         }
@@ -39,28 +30,16 @@ public class MagisterArmorItemModel extends GeoModel<MagisterArmor> {
 
     @Override
     public Identifier getTextureResource(MagisterArmor orb) {
-        if(orb.getSlotType() == EquipmentSlot.HEAD){
-            if(orb.getMagicSchool().equals(SpellSchools.ARCANE)){
-                return Identifier.of(Hexblade.MOD_ID,"textures/armor/magebane_crown.png");
 
-
-            }
-            if(orb.getMagicSchool().equals(SpellSchools.FROST)){
-                return Identifier.of(Hexblade.MOD_ID,"textures/armor/mageseeker_hat.png");
-
-            }
-            return Identifier.of(Hexblade.MOD_ID,"textures/armor/magebreaker_helmet.png");
-
-        }
         if(orb.getMagicSchool().equals(SpellSchools.ARCANE)){
 
             return Identifier.of(Hexblade.MOD_ID,"textures/armor/aetherfire.png");
         }
         if(orb.getMagicSchool().equals(SpellSchools.FIRE)){
-            return Identifier.of(Hexblade.MOD_ID,"textures/armor/rimeblaze.png");
+            return Identifier.of(Hexblade.MOD_ID,"textures/armor/sunfire.png");
 
         }
-            return Identifier.of(Hexblade.MOD_ID,"textures/armor/deathchill.png");
+            return Identifier.of(Hexblade.MOD_ID,"textures/armor/soulfrost.png");
 
     }
 

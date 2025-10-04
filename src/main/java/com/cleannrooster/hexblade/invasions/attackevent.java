@@ -41,7 +41,7 @@ public class attackevent implements piglinsummon {
 
     @Override
     public void tick() {
-        if(this.tickCount % 5 == 0 && !level.isClient()){
+        if(this.tickCount % 20 == 0 && !level.isClient()){
             Optional<HexbladePortal> frame = piglinsummon.summonNetherPortal(this.level,this.player,false);
             if(frame.isPresent()){
                 this.level.spawnEntity(frame.get());
